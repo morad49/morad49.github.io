@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,13 +20,8 @@ body {
   position:relative;
 }
 
-/* محتوى */
 .container { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; }
 
-/* float animation */
-@keyframes float { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-10px);} }
-
-/* اسم السيرفر */
 h1 {
   font-size:3rem;
   font-weight:bold;
@@ -34,20 +29,16 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 10px;
-  animation: float 4s ease-in-out infinite;
 }
 
-/* IP info */
 p.ip {
   font-size:1.2rem;
   background: linear-gradient(90deg, #a7f3d0, #22c55e);
   padding:8px 16px;
   border-radius:12px;
   margin-bottom:20px;
-  animation: float 3s ease-in-out infinite alternate;
 }
 
-/* وصف السيرفر */
 p.desc {
   font-size:1rem;
   max-width:280px;
@@ -58,7 +49,6 @@ p.desc {
   line-height:1.4;
 }
 
-/* الأزرار */
 .buttons { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-bottom:15px; }
 
 .btn {
@@ -71,13 +61,19 @@ p.desc {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow:0 6px 15px rgba(0,0,0,0.4);
   min-width:120px;
-  animation: float 3s ease-in-out infinite alternate;
 }
 
 .btn:hover,
 .btn:active { transform: translateY(-8px); box-shadow:0 10px 20px rgba(0,0,0,0.5); }
 
-/* نافذة الاسم */
+@media(max-width:600px){
+  h1{font-size:2.2rem;}
+  p.ip{font-size:1rem;padding:6px 12px;}
+  p.desc{font-size:0.9rem; max-width:200px;}
+  .btn{font-size:0.9rem;padding:12px 20px;min-width:100px;}
+}
+
+/* Name Prompt */
 #namePrompt {
   position:fixed;
   inset:0;
@@ -95,36 +91,26 @@ p.desc {
 #namePrompt button { padding:8px 16px; border-radius:8px; border:none; background:#16a34a; color:white; font-weight:bold; cursor:pointer; }
 #namePrompt button:hover { background:#22c55e; }
 
-/* قسم إداري */
 #sport { display:none; margin-top:15px; padding:10px 20px; background:linear-gradient(90deg,#facc15,#fbbf24); border-radius:12px; }
 
-/* Chat */
 #chatSection { display:none; flex-direction:column; align-items:center; margin-top:20px; }
 #chatLog { background: rgba(0,0,0,0.3); padding:10px; border-radius:10px; width:90%; max-width:320px; height:150px; overflow-y:auto; margin-bottom:10px; }
 #chatInput { padding:6px 10px; border-radius:8px; border:none; width:70%; max-width:250px; }
 #chatBtn { padding:6px 12px; border-radius:8px; border:none; background:#16a34a; color:white; cursor:pointer; margin-left:5px; }
 #chatBtn:hover { background:#22c55e; }
-
-@media(max-width:600px){
-  h1{font-size:2.2rem;}
-  p.ip{font-size:1rem;padding:6px 12px;}
-  p.desc{font-size:0.9rem; max-width:200px;}
-  .btn{font-size:0.9rem;padding:12px 20px;min-width:100px;}
-  #chatLog{height:120px;}
-}
 </style>
 </head>
 <body>
 
 <div id="namePrompt">
-  <p>اكتب اسمك ماينكرافت:</p>
-  <input type="text" id="playerName" placeholder="اسمك...">
-  <button onclick="enterSite()">دخول</button>
+  <p>Enter your Minecraft name:</p>
+  <input type="text" id="playerName" placeholder="Your name...">
+  <button onclick="enterSite()">Enter</button>
 </div>
 
 <div class="container" style="display:none;">
   <h1>DirtMc</h1>
-  <p class="ip">ɪᴘ: ᴅɪʀᴛᴍᴄ.ᴘʀᴏ &nbsp; ᴘᴏʀᴛ: 21411</p>
+  <p class="ip">IP: dirtmc.pro &nbsp; PORT: 21411</p>
 
   <div class="buttons">
     <a class="btn" href="https://discord.gg/dirtmc" target="_blank">Discord</a>
@@ -132,40 +118,32 @@ p.desc {
   </div>
 
   <p class="desc">
-    أفضل سيرفر ماينكرافت لجميع الفئات! 🟢
-    استمتع باللعب، المغامرات، والتحديات مع لاعبين من جميع أنحاء العالم!
+    Best Minecraft server for all ages! 🟢
+    Enjoy adventures, challenges, and fun with players worldwide!
   </p>
 
-  <!-- رتبة إدارية -->
-  <div id="sport">قسم Sport الإداري (Admin Only)</div>
+  <div id="sport">Sport Section (Admin Only)</div>
 
-  <!-- Chat -->
   <div id="chatSection">
-    <p>Chat مع اللاعبين:</p>
+    <p>Chat with players:</p>
     <div id="chatLog"></div>
-    <input type="text" id="chatInput" placeholder="اكتب رسالتك...">
-    <button id="chatBtn">ارسال</button>
+    <input type="text" id="chatInput" placeholder="Type your message...">
+    <button id="chatBtn">Send</button>
   </div>
 </div>
 
 <script>
-// اسم اللاعب + ظهور الموقع
-let isAdmin = false; // عدل true لو تريد تجربة الرتبة الإدارية
+let isAdmin = false; // set true to test admin section
 function enterSite(){
   const name = document.getElementById('playerName').value.trim();
-  if(name === ""){
-    alert("يجب كتابة اسمك ماينكرافت!");
-    return;
-  }
+  if(name===''){ alert("You must enter your Minecraft name!"); return; }
   document.getElementById('namePrompt').style.display='none';
   document.querySelector('.container').style.display='flex';
-  // عرض قسم Sport لو admin
-  if(isAdmin){ document.getElementById('sport').style.display='block'; }
-  // عرض Chat
+  if(isAdmin) document.getElementById('sport').style.display='block';
   document.getElementById('chatSection').style.display='flex';
 }
 
-// Chat محلي (لوحدك)
+// Chat local
 const chatLog = document.getElementById('chatLog');
 document.getElementById('chatBtn').onclick = () => {
   const input = document.getElementById('chatInput');
@@ -177,14 +155,12 @@ document.getElementById('chatBtn').onclick = () => {
   input.value='';
 }
 
-// Particles دوائر صغيرة عشوائية متدرجة أخضر
+// Particles random movement
 const total = 80;
 for(let i=0;i<total;i++){
   const p = document.createElement('div');
-  p.classList.add('particle');
-  const size = Math.random()*6+3;
-  p.style.width = size+'px';
-  p.style.height = size+'px';
+  p.style.width = (Math.random()*6+3)+'px';
+  p.style.height = p.style.width;
   p.style.borderRadius='50%';
   const g = Math.floor(Math.random()*155 + 50);
   const r = Math.floor(Math.random()*50);
@@ -194,17 +170,17 @@ for(let i=0;i<total;i++){
   p.style.left = Math.random()*100+'vw';
   p.style.top = Math.random()*100+'vh';
   document.body.appendChild(p);
-  animateParticle(p);
-}
 
-function animateParticle(el){
+  // random movement
+  const speed = Math.random()*0.3+0.1;
+  const angle = Math.random()*Math.PI*2;
   function move(){
-    let x = parseFloat(el.style.left) + (Math.random()*2-1)*0.5;
-    let y = parseFloat(el.style.top) + (Math.random()*2-1)*0.5;
-    if(x>100) x=0; if(x<0)x=100;
-    if(y>100) y=0; if(y<0)y=100;
-    el.style.left=x+'vw';
-    el.style.top=y+'vh';
+    let x = parseFloat(p.style.left) + Math.cos(angle+Math.random()*0.5-0.25)*speed;
+    let y = parseFloat(p.style.top) + Math.sin(angle+Math.random()*0.5-0.25)*speed;
+    if(x>100)x=0; if(x<0)x=100;
+    if(y>100)y=0; if(y<0)y=100;
+    p.style.left=x+'vw';
+    p.style.top=y+'vh';
     requestAnimationFrame(move);
   }
   move();
