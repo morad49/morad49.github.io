@@ -1,218 +1,430 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DirtMC</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DirtMC — Premium Minecraft Server</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, sans-serif; }
+  :root{
+    --bg-1: #061d07;
+    --bg-2: #08300a;
+    --accent-1: #16a34a;
+    --accent-2: #6ee7b7;
+    --card-bg: rgba(255,255,255,0.03);
+    --glass: rgba(255,255,255,0.04);
+    --muted: rgba(255,255,255,0.75);
+  }
 
-body {
-  height:100vh;
-  background:#0b3d0b;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  align-items:center;
-  color:white;
-  text-align:center;
-  position:relative;
-}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    color:#e9fff0;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+  }
 
-/* Container */
-.container { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; margin-top:30px; }
+  /* Canvas background fills whole viewport */
+  #bgCanvas{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    display:block;
+  }
 
-/* Floating DirtMc animation */
-#floatingDirtMc {
-  position:absolute;
-  font-size:2.5rem;
-  font-weight:bold;
-  z-index:2;
-  pointer-events:none;
-  background: linear-gradient(90deg,#22c55e,#6ee7b7,#16a34a);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  opacity:0;
-  transition: all 1s ease-in-out;
-}
+  .wrap{
+    position:relative;
+    z-index:2;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding:48px 20px 120px;
+    gap:28px;
+  }
 
-/* Server name */
-h1 {
-  font-size:3rem;
-  font-weight:bold;
-  background: linear-gradient(90deg, #6ee7b7, #22c55e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 10px;
-}
+  /* HERO */
+  .hero{
+    width:100%; max-width:1100px;
+    display:flex;
+    gap:28px;
+    align-items:center;
+    justify-content:space-between;
+  }
 
-/* IP info */
-p.ip {
-  font-size:1.2rem;
-  background: linear-gradient(90deg, #a7f3d0, #22c55e);
-  padding:8px 16px;
-  border-radius:12px;
-  margin-bottom:20px;
-}
+  .hero-left{
+    flex:1 1 560px;
+    padding:28px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+  }
 
-/* Description */
-p.desc {
-  font-size:1rem;
-  max-width:320px;
-  background: rgba(0,0,0,0.3);
-  padding:12px 16px;
-  border-radius:12px;
-  margin-bottom:20px;
-  line-height:1.4;
-}
+  .tag{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:6px 10px; border-radius:999px; font-weight:600;
+    background: linear-gradient(90deg,var(--accent-2),var(--accent-1));
+    color:#051806; width:max-content; margin-bottom:14px;
+    box-shadow: 0 6px 18px rgba(22,163,74,0.12);
+  }
 
-/* Buttons */
-.buttons { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-bottom:20px; }
+  h1{
+    margin:6px 0 8px 0; font-size:40px; line-height:1.02; letter-spacing:-0.02em;
+    background: linear-gradient(90deg,var(--accent-2),var(--accent-1));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    font-weight:800;
+  }
 
-.btn {
-  background: linear-gradient(90deg, #4ade80, #16a34a);
-  color:white;
-  padding:14px 28px;
-  border-radius:12px;
-  font-size:1rem;
-  text-decoration:none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow:0 6px 15px rgba(0,0,0,0.4);
-  min-width:120px;
-}
+  .subtitle{
+    color:var(--muted); font-size:16px; max-width:720px; margin-bottom:18px;
+  }
 
-.btn:hover { transform: translateY(-8px); box-shadow:0 10px 20px rgba(0,0,0,0.5); }
+  .actions{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
 
-/* Footer Tabs */
-#tabs {
-  position:fixed;
-  bottom:0;
-  width:100%;
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  padding:10px 0;
-  background: rgba(0,0,0,0.6);
-  z-index:5;
-}
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:12px 16px; border-radius:12px; cursor:pointer; border:0;
+    font-weight:700; text-decoration:none;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.45);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:active{ transform: translateY(-2px); }
 
-.tab {
-  background: linear-gradient(90deg,#22c55e,#6ee7b7);
-  padding:10px 20px;
-  border-radius:12px;
-  cursor:pointer;
-  transition: all 0.3s ease;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  color:white;
-}
+  .btn-join{
+    background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+    color:#041205; font-size:16px;
+  }
 
-.tab:hover { transform: translateY(-5px); box-shadow:0 6px 15px rgba(0,0,0,0.5); }
+  .btn-copy{
+    background:transparent; border:1px solid rgba(255,255,255,0.08);
+    color:var(--muted); font-size:15px; padding:10px 12px;
+  }
 
-/* Phases */
-.phase { font-size:0.85rem; margin-top:6px; }
+  .socials{ display:flex; gap:10px; margin-left:6px; }
 
-.phase span { display:block; margin:2px 0; }
+  .social{
+    display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px;
+    background:var(--glass); color:var(--muted); font-weight:600; text-decoration:none;
+    transition:transform .14s ease, box-shadow .14s ease;
+  }
+  .social:hover{ transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,0.45); }
 
-/* Responsive */
-@media(max-width:600px){
-  h1{font-size:2.2rem;}
-  p.ip{font-size:1rem;padding:6px 12px;}
-  p.desc{font-size:0.9rem; max-width:240px;}
-  .btn{font-size:0.9rem;padding:12px 20px;min-width:100px;}
-  #tabs { flex-direction:column; gap:10px; }
-}
+  /* RIGHT COLUMN - stats / quick info */
+  .hero-right{
+    width:320px; min-width:240px;
+    padding:18px; border-radius:12px; background:var(--card-bg);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    display:flex; flex-direction:column; gap:14px;
+  }
+
+  .stat{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:10px; border-radius:10px; background:rgba(255,255,255,0.01);
+  }
+  .stat h4{ margin:0; font-size:14px; color:var(--muted); }
+  .stat p{ margin:0; font-weight:700; color:#fff; }
+
+  /* FEATURES */
+  .features{
+    width:100%; max-width:1100px; display:grid;
+    grid-template-columns: repeat(3,1fr);
+    gap:18px; margin-top:6px;
+  }
+  .card{
+    background:var(--card-bg); padding:18px; border-radius:12px; transition: transform .18s ease, box-shadow .18s ease;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  }
+  .card:hover{ transform: translateY(-8px); box-shadow: 0 18px 40px rgba(0,0,0,0.6); }
+  .card h3{ margin:0 0 8px 0; }
+  .pill{ display:inline-block; padding:6px 8px; border-radius:999px; background:rgba(255,255,255,0.03); font-weight:700; }
+
+  /* FOOTER */
+  footer{
+    width:100%; max-width:1100px; margin-top:28px; padding:18px; border-radius:12px; background:rgba(255,255,255,0.02);
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  }
+  .copy-small{ display:inline-flex; align-items:center; gap:8px; color:var(--muted); font-weight:600; }
+
+  /* small screens */
+  @media (max-width:920px){
+    .hero{flex-direction:column; align-items:stretch;}
+    .hero-right{width:100%}
+    .features{grid-template-columns:repeat(1,1fr)}
+    .hero-left{order:0}
+  }
+
+  @media (max-width:420px){
+    h1{font-size:28px}
+    .subtitle{font-size:14px}
+  }
+
+  /* tiny helper for tooltip */
+  .tooltip{
+    display:inline-block; padding:6px 10px; border-radius:8px; background:#0f2a11; color:#bfffd6; font-weight:700;
+    transform-origin:center; opacity:0; pointer-events:none; transition:opacity .18s ease;
+  }
+  .tooltip.show{ opacity:1; }
 </style>
 </head>
 <body>
 
-<div id="floatingDirtMc">DirtMc ✨💚</div>
+<!-- Canvas for particles -->
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
 
-<div class="container">
-  <h1>DirtMc</h1>
-  <p class="ip">IP: dirtmc.pro &nbsp; PORT: 21411</p>
+<div class="wrap">
+  <!-- HERO -->
+  <div class="hero" role="banner">
+    <div class="hero-left" aria-labelledby="heroTitle">
+      <div class="tag">✨ DirtMC • Premium</div>
+      <h1 id="heroTitle">DirtMC — Premium Minecraft Experience</h1>
+      <p class="subtitle">Fast, friendly and stable server — PvP arenas, fast minigames, custom items and weekly events. Join now and meet players from all over the world! 🌍⛏️</p>
 
-  <div class="buttons">
-    <a class="btn" href="https://discord.gg/dirtmc" target="_blank">Discord 💬</a>
-    <a class="btn" href="https://www.tiktok.com/@dirtmc_?_r=1&_t=ZS-93afGsWFEpu" target="_blank">TikTok 🎵</a>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="actions">
+          <button class="btn btn-join" id="joinBtn">▶ Join Server</button>
+          <button class="btn btn-copy" id="copyIPBtn">📋 Copy IP</button>
+          <span id="copiedTip" class="tooltip" aria-hidden="true">Copied!</span>
+        </div>
+
+        <div class="socials" style="margin-left:8px;">
+          <a class="social" href="https://discord.gg/dirtmc" target="_blank" rel="noopener">💬 Discord</a>
+          <a class="social" href="https://www.tiktok.com/@dirtmc_?_r=1&_t=ZS-93afGsWFEpu" target="_blank" rel="noopener">🎵 TikTok</a>
+        </div>
+      </div>
+    </div>
+
+    <aside class="hero-right" aria-label="Server Info">
+      <div class="stat"><h4>Status</h4><p id="statusText">Online</p></div>
+      <div class="stat"><h4>Players</h4><p id="playersText">—</p></div>
+      <div class="stat"><h4>Uptime</h4><p>99.9%</p></div>
+    </aside>
   </div>
 
-  <p class="desc">
-    Best Minecraft server for all ages! 🟢<br>
-    Enjoy adventures, challenges, and fun with players worldwide! 🌎⛏️
-  </p>
-</div>
+  <!-- FEATURES -->
+  <div class="features" role="list">
+    <div class="card" role="listitem">
+      <h3>⚔️ BoxPvP</h3>
+      <div class="pill">Soon</div>
+      <p style="color:var(--muted); margin-top:10px;">Fast, skill-based arenas. Ranked ladders and community tournaments.</p>
+    </div>
 
-<!-- Footer Tabs -->
-<div id="tabs">
-  <div class="tab" id="javaTab">
-    🖥️ Java Edition
-    <div class="phase">
-      <span>QuickBox ⛏️ - under development</span>
-      <span>BoxPvP ⚔️ - Soon</span>
-      <span>SMP 🌎 - Soon</span>
+    <div class="card" role="listitem">
+      <h3>⛏️ QuickBox</h3>
+      <div class="pill">In development</div>
+      <p style="color:var(--muted); margin-top:10px;">Lightning-fast mini-games designed for quick rounds and fun prizes.</p>
+    </div>
+
+    <div class="card" role="listitem">
+      <h3>🌎 SMP</h3>
+      <div class="pill">Soon</div>
+      <p style="color:var(--muted); margin-top:10px;">Classic survival with economy, towns, events and seasonal updates.</p>
     </div>
   </div>
-  <div class="tab" id="bedrockTab">
-    📱 Bedrock Edition
-    <div class="phase">
-      <span>QuickBox ⛏️ - under development</span>
-      <span>BoxPvP ⚔️ - Soon</span>
-      <span>SMP 🌎 - Soon</span>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      <strong>DirtMC</strong> • <span style="color:var(--muted)">Minecraft Server</span>
     </div>
-  </div>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <div class="copy-small">IP: <code style="margin-left:8px; background:rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px;">dirtmc.pro:21411</code></div>
+      <div style="width:1px; height:24px; background:rgba(255,255,255,0.03); margin:0 8px"></div>
+      <div style="color:var(--muted)">Made with ❤️ • <span id="year"></span></div>
+    </div>
+  </footer>
 </div>
 
 <script>
-// Floating DirtMc rare animation
-const floating = document.getElementById('floatingDirtMc');
-function showFloatingDirtMc(){
-  const x = Math.random()*80+10; // % from left
-  const y = Math.random()*50+10; // % from top
-  floating.style.left = x+'vw';
-  floating.style.top = y+'vh';
-  floating.style.opacity = 1;
-  floating.style.transform = 'scale(1.5)';
-  setTimeout(()=>{
-    floating.style.opacity = 0;
-    floating.style.transform = 'scale(1)';
-  },2500);
-}
-// random trigger every 5-12 sec
-setInterval(()=>{ if(Math.random()>0.5) showFloatingDirtMc(); },5000+Math.random()*7000);
+/* =========================
+   Canvas Particles System
+   Using canvas for good performance on mobile/desktop
+   - circles + small squares
+   - randomized velocity, size, alpha, hue around green
+   - adaptive count based on screen size
+   ========================= */
 
-// Advanced particles
-const total = 80;
-for(let i=0;i<total;i++){
-  const p = document.createElement('div');
-  const size = Math.random()*6+3;
-  p.style.width = size+'px';
-  p.style.height = size+'px';
-  p.style.borderRadius='50%';
-  const g = Math.floor(Math.random()*155 + 50);
-  const r = Math.floor(Math.random()*50);
-  const b = Math.floor(Math.random()*50);
-  p.style.background = `rgba(${r},${g},${b},0.6)`;
-  p.style.position='absolute';
-  p.style.left = Math.random()*100+'vw';
-  p.style.top = Math.random()*100+'vh';
-  document.body.appendChild(p);
+(function(){
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let DPR = Math.max(1, window.devicePixelRatio || 1);
+  let W = 0, H = 0;
+  let particles = [];
+  let squares = [];
+  let particleCount;
 
-  const speed = Math.random()*0.3+0.1;
-  function move(){
-    let x = parseFloat(p.style.left) + (Math.random()*2-1)*speed;
-    let y = parseFloat(p.style.top) + (Math.random()*2-1)*speed;
-    if(x>100)x=0; if(x<0)x=100;
-    if(y>100)y=0; if(y<0)y=100;
-    p.style.left=x+'vw';
-    p.style.top=y+'vh';
-    requestAnimationFrame(move);
+  function resize(){
+    DPR = Math.max(1, window.devicePixelRatio || 1);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    // adjust particle count by area
+    particleCount = Math.max(30, Math.min(140, Math.floor((W*H)/6000)));
+    initParticles();
   }
-  move();
-}
-</script>
 
+  function rand(min,max){ return Math.random()*(max-min)+min; }
+
+  function initParticles(){
+    particles = [];
+    squares = [];
+    for(let i=0;i<particleCount;i++){
+      const size = rand(2.5,7);
+      const x = rand(0,W);
+      const y = rand(0,H);
+      // velocities small and varied
+      const vx = rand(-0.25,0.25);
+      const vy = rand(-0.25,0.25);
+      // color greenish with variety
+      const g = Math.floor(rand(80,220));
+      const r = Math.floor(rand(0,30));
+      const b = Math.floor(rand(0,30));
+      const alpha = rand(0.25,0.9);
+      particles.push({x,y,vx,vy,size,r,g,b,alpha,phase:rand(0,Math.PI*2)});
+    }
+    // squares fewer
+    const sqCount = Math.max(6, Math.floor(particleCount/12));
+    for(let i=0;i<sqCount;i++){
+      const size = rand(6,14);
+      const x = rand(0,W);
+      const y = rand(0,H);
+      const vx = rand(-0.18,0.18);
+      const vy = rand(-0.18,0.18);
+      const g = Math.floor(rand(90,200));
+      const r = Math.floor(rand(0,20));
+      const b = Math.floor(rand(0,20));
+      squares.push({x,y,vx,vy,size,r,g,b,alpha: rand(0.25,0.9),angle:rand(0,Math.PI*2)});
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // subtle vignette / blur-like overlay
+    // draw particles
+    for(let p of particles){
+      p.x += p.vx + Math.cos(p.phase)*0.05;
+      p.y += p.vy + Math.sin(p.phase)*0.03;
+      p.phase += 0.01;
+      if(p.x < -20) p.x = W + 20;
+      if(p.x > W + 20) p.x = -20;
+      if(p.y < -20) p.y = H + 20;
+      if(p.y > H + 20) p.y = -20;
+
+      // subtle pulse
+      const pulse = 0.6 + 0.4*Math.sin(p.phase*1.5);
+      const size = p.size * pulse;
+
+      // glow
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.alpha*0.25})`;
+      ctx.arc(p.x, p.y, size*2.6, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.alpha})`;
+      ctx.arc(p.x, p.y, size, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // draw squares (small cubes)
+    for(let s of squares){
+      s.x += s.vx;
+      s.y += s.vy;
+      s.angle += 0.005;
+      if(s.x < -30) s.x = W + 30;
+      if(s.x > W + 30) s.x = -30;
+      if(s.y < -30) s.y = H + 30;
+      if(s.y > H + 30) s.y = -30;
+
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.angle);
+      ctx.fillStyle = `rgba(${s.r},${s.g},${s.b},${s.alpha})`;
+      ctx.fillRect(-s.size/2, -s.size/2, s.size, s.size);
+      ctx.restore();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+
+/* =========================
+   UI Interactions: copy IP, Join button, tiny faux server status
+   ========================= */
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// copy IP button
+const copyBtn = document.getElementById('copyIPBtn');
+const joinBtn = document.getElementById('joinBtn');
+const tip = document.getElementById('copiedTip');
+
+copyBtn.addEventListener('click', async () => {
+  try{
+    await navigator.clipboard.writeText('dirtmc.pro:21411');
+    tip.classList.add('show');
+    setTimeout(()=> tip.classList.remove('show'), 1400);
+  }catch(e){
+    // fallback
+    const el = document.createElement('textarea');
+    el.value = 'dirtmc.pro:21411';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    el.remove();
+    tip.classList.add('show');
+    setTimeout(()=> tip.classList.remove('show'), 1400);
+  }
+});
+
+// Join button: show small popup then copy IP (can't auto-open Minecraft)
+joinBtn.addEventListener('click', () => {
+  // quick visual feedback
+  joinBtn.textContent = '✔ Copied & Ready';
+  setTimeout(()=> joinBtn.textContent = '▶ Join Server', 1400);
+  navigator.clipboard && navigator.clipboard.writeText && navigator.clipboard.writeText('dirtmc.pro:21411').catch(()=>{});
+});
+
+// tiny faux status (placeholder) — you can replace later with real API ping
+(function serverStatus(){
+  const st = document.getElementById('statusText');
+  const pl = document.getElementById('playersText');
+  // simple animated fake numbers to give polish
+  let players = Math.floor(Math.random()*45 + 5);
+  pl.textContent = players + ' online';
+  // change slightly every 12s
+  setInterval(()=> {
+    players = Math.max(0, players + Math.floor(Math.random()*7-3));
+    pl.textContent = players + ' online';
+    if(Math.random()>0.92) st.textContent = 'Restarting';
+    else st.textContent = 'Online';
+  },12000);
+})();
+
+/* =========================
+  Notes for you:
+  - This is a self-contained static page ready for GitHub Pages.
+  - To add "real" server status or realtime features (chat, players),
+    connect a small backend or use third-party service (Firebase, your server API).
+  - To change colors: edit :root variables at top.
+  ========================= */
+</script>
 </body>
 </html>
