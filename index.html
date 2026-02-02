@@ -5,131 +5,181 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>DirtMC — Premium Minecraft Server</title>
 
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-  :root{
-    --bg-1: #061d07;
-    --bg-2: #08300a;
-    --accent-1: #16a34a;
-    --accent-2: #6ee7b7;
-    --card-bg: rgba(255,255,255,0.03);
-    --glass: rgba(255,255,255,0.04);
-    --muted: rgba(255,255,255,0.75);
+:root{
+  --bg-1: #061d07;
+  --bg-2: #08300a;
+  --accent-1: #16a34a;
+  --accent-2: #6ee7b7;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:#e9fff0;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+body{background:linear-gradient(180deg,var(--bg-1) 0%,var(--bg-2) 100%);}
+
+#bgCanvas{
+  position:fixed; inset:0; z-index:0; display:block;
+}
+
+.wrap{
+  position:relative; z-index:2; min-height:100vh;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  padding:48px 20px 120px; gap:28px;
+}
+
+.hero{
+  width:100%; max-width:1100px;
+  display:flex; gap:28px; align-items:center; justify-content:space-between;
+}
+
+.hero-left{
+  flex:1 1 560px; padding:28px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+}
+
+.tag{
+  display:inline-flex; align-items:center; gap:10px; padding:6px 10px;
+  border-radius:999px; font-weight:600; background: linear-gradient(90deg,var(--accent-2),var(--accent-1));
+  color:#051806; width:max-content; margin-bottom:14px; box-shadow:0 6px 18px rgba(22,163,74,0.12);
+}
+
+h1{
+  margin:6px 0 8px 0; font-size:40px; line-height:1.02; letter-spacing:-0.02em;
+  background: linear-gradient(90deg,var(--accent-2),var(--accent-1));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  font-weight:800;
+}
+
+.subtitle{
+  color:#a7f3d0; font-size:16px; max-width:720px; margin-bottom:18px;
+}
+
+.actions{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+
+.btn{
+  display:inline-flex; align-items:center; gap:10px; padding:12px 16px;
+  border-radius:12px; cursor:pointer; border:0; font-weight:700; text-decoration:none;
+  box-shadow:0 10px 24px rgba(0,0,0,0.45);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.btn:active{ transform: translateY(-2px); }
+
+.btn-join{
+  background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
+  color:#041205; font-size:16px;
+}
+
+.socials{ display:flex; gap:10px; margin-left:6px; }
+
+.social{
+  display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px;
+  background:rgba(255,255,255,0.04); color:#a7f3d0; font-weight:600; text-decoration:none;
+  transition:transform .14s ease, box-shadow .14s ease;
+}
+.social:hover{ transform: translateY(-6px); box-shadow:0 12px 30px rgba(0,0,0,0.45); }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="wrap">
+  <div class="hero" role="banner">
+    <div class="hero-left" aria-labelledby="heroTitle">
+      <div class="tag">✨ DirtMC • Premium</div>
+      <h1 id="heroTitle">DirtMC — Premium Minecraft Experience</h1>
+      <p class="subtitle">Fast, friendly and stable server — PvP arenas, fast minigames, custom items and weekly events. Join now and meet players from all over the world! 🌍⛏️</p>
+
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="actions">
+          <button class="btn btn-join" id="joinBtn">▶ Join Server</button>
+        </div>
+        <div class="socials" style="margin-left:8px;">
+          <a class="social" href="https://discord.gg/dirtmc" target="_blank" rel="noopener">💬 Discord</a>
+          <a class="social" href="https://www.tiktok.com/@dirtmc_?_r=1&_t=ZS-93afGsWFEpu" target="_blank" rel="noopener">🎵 TikTok</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Join button copy IP */
+const joinBtn = document.getElementById('joinBtn');
+joinBtn.addEventListener('click', ()=>{
+  joinBtn.textContent = '✔ Copied & Ready';
+  setTimeout(()=> joinBtn.textContent = '▶ Join Server', 1400);
+  navigator.clipboard.writeText('dirtmc.pro:21411').catch(()=>{});
+});
+
+/* Green Black Hole Background */
+(function(){
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let W = window.innerWidth;
+  let H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+
+  window.addEventListener('resize',()=>{
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+  });
+
+  const particles = [];
+  const numParticles = 350;
+  for(let i=0;i<numParticles;i++){
+    particles.push({
+      angle: Math.random()*Math.PI*2,
+      radius: Math.random()*Math.min(W,H)*0.45,
+      speed: 0.002 + Math.random()*0.002,
+      size: 1+Math.random()*2
+    });
   }
 
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
-    color:#e9fff0;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    overflow-x:hidden;
+  const mouse = {x: W/2, y: H/2};
+  window.addEventListener('mousemove', e=>{ mouse.x = e.clientX; mouse.y = e.clientY; });
+
+  function center(){ return {x: W/2, y: H/2}; }
+
+  function draw(){
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.fillRect(0,0,W,H);
+
+    const c = center();
+    particles.forEach(p=>{
+      p.angle += p.speed;
+      p.radius *= 0.996;
+      if(p.radius<10) p.radius = Math.random()*Math.min(W,H)*0.45;
+
+      const x = c.x + Math.cos(p.angle)*p.radius;
+      const y = c.y + Math.sin(p.angle)*p.radius;
+
+      const dx = (mouse.x - x)*0.002;
+      const dy = (mouse.y - y)*0.002;
+
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(22,255,106,0.7)';
+      ctx.arc(x+dx, y+dy, p.size*2.5,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(22,255,106,1)';
+      ctx.arc(x+dx, y+dy, p.size,0,Math.PI*2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
   }
 
-  #bgCanvas{
-    position:fixed;
-    inset:0;
-    z-index:0;
-    display:block;
-  }
-
-  .wrap{
-    position:relative;
-    z-index:2;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    padding:48px 20px 120px;
-    gap:28px;
-  }
-
-  .hero{
-    width:100%; max-width:1100px;
-    display:flex;
-    gap:28px;
-    align-items:center;
-    justify-content:space-between;
-  }
-
-  .hero-left{
-    flex:1 1 560px;
-    padding:28px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-    backdrop-filter: blur(6px);
-  }
-
-  .tag{
-    display:inline-flex; align-items:center; gap:10px;
-    padding:6px 10px; border-radius:999px; font-weight:600;
-    background: linear-gradient(90deg,var(--accent-2),var(--accent-1));
-    color:#051806; width:max-content; margin-bottom:14px;
-    box-shadow: 0 6px 18px rgba(22,163,74,0.12);
-  }
-
-  h1{
-    margin:6px 0 8px 0; font-size:40px; line-height:1.02; letter-spacing:-0.02em;
-    background: linear-gradient(90deg,var(--accent-2),var(--accent-1));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    font-weight:800;
-  }
-
-  .subtitle{
-    color:var(--muted); font-size:16px; max-width:720px; margin-bottom:18px;
-  }
-
-  .actions{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-
-  .btn{
-    display:inline-flex; align-items:center; gap:10px;
-    padding:12px 16px; border-radius:12px; cursor:pointer; border:0;
-    font-weight:700; text-decoration:none;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.45);
-    transition: transform .18s ease, box-shadow .18s ease;
-  }
-  .btn:active{ transform: translateY(-2px); }
-
-  .btn-join{
-    background: linear-gradient(90deg,var(--accent-1),var(--accent-2));
-    color:#041205; font-size:16px;
-  }
-
-  .btn-copy{
-    background:transparent; border:1px solid rgba(255,255,255,0.08);
-    color:var(--muted); font-size:15px; padding:10px 12px;
-  }
-
-  .socials{ display:flex; gap:10px; margin-left:6px; }
-
-  .social{
-    display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px;
-    background:var(--glass); color:var(--muted); font-weight:600; text-decoration:none;
-    transition:transform .14s ease, box-shadow .14s ease;
-  }
-  .social:hover{ transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,0.45); }
-
-  .hero-right{
-    width:320px; min-width:240px;
-    padding:18px; border-radius:12px; background:var(--card-bg);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-    display:flex; flex-direction:column; gap:14px;
-  }
-
-  .stat{
-    display:flex; justify-content:space-between; align-items:center; gap:12px;
-    padding:10px; border-radius:10px; background:rgba(255,255,255,0.01);
-  }
-  .stat h4{ margin:0; font-size:14px; color:var(--muted); }
-  .stat p{ margin:0; font-weight:700; color:#fff; }
-
-  .features{
-    width:100%; max-width:1100px; display:grid;
-    grid-template-columns: repeat(3,1fr);
+  draw();
+})();
+</script>
+</body>
+</html>
