@@ -1,285 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>DirtMC</title>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DirtMC — Legendary</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-body{
- margin:0;
- background:black;
- font-family:Arial;
- overflow:hidden;
- color:white;
-}
+  :root{
+    --g1:#06ff7a;
+    --g2:#12c86f;
+    --muted:rgba(255,255,255,0.9);
+    --glass: rgba(255,255,255,0.03);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:#000; color:var(--muted); overflow:hidden;}
+  /* CANVAS fills background */
+  #bgCanvas{ position:fixed; inset:0; z-index:0; display:block; background:#000; }
 
-/* ===== Stars ===== */
+  /* SPLASH (loading cinematic) */
+  #splash{
+    position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column;
+    background:linear-gradient(180deg,#000,#00130a);
+  }
+  #splash .title {
+    font-size:64px; font-weight:900; color:var(--g1); letter-spacing:2px;
+    text-transform:uppercase;
+    text-shadow:
+      0 4px 0 rgba(0,0,0,0.6),
+      0 8px 30px rgba(6,255,120,0.12),
+      0 0 50px rgba(6,255,120,0.06);
+    transform: perspective(700px) rotateX(12deg);
+  }
+  .loader-wrap{ margin-top:28px; text-align:center; width:420px; max-width:88%; }
+  .load-counter{ color:var(--g1); font-weight:800; margin-bottom:8px; font-size:18px; }
+  .load-bar{
+    height:14px; background:rgba(255,255,255,0.03); border-radius:999px; overflow:hidden; position:relative;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  }
+  .load-fill{
+    width:0%; height:100%; background:linear-gradient(90deg,var(--g1),var(--g2)); border-radius:999px; transition:width .18s linear;
+    box-shadow: 0 8px 30px rgba(6,255,120,0.12), inset 0 0 18px rgba(6,255,120,0.06);
+  }
 
-.stars{
- position:fixed;
- width:100%;
- height:100%;
- background:url("https://www.transparenttextures.com/patterns/stardust.png");
- animation:moveStars 60s linear infinite;
- opacity:.6;
-}
+  /* MAIN CONTENT (hidden until loaded) */
+  .wrap{
+    position:relative; z-index:200; min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:20px; gap:18px; text-align:center;
+  }
 
-@keyframes moveStars{
- from{background-position:0 0;}
- to{background-position:10000px 5000px;}
-}
+  /* 3D Title */
+  .dirt-title{
+    font-size:clamp(34px,8vw,72px); font-weight:900; line-height:1;
+    color:var(--g1);
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    text-shadow:
+      0 6px 0 rgba(0,0,0,0.6),
+      0 10px 40px rgba(6,255,120,0.08),
+      0 0 30px rgba(6,255,120,0.12);
+    transform: translateZ(0);
+    /* faux 3D extrusion */
+    position:relative;
+  }
+  .dirt-title::after{
+    content:"DirtMC";
+    position:absolute; left:0; top:7px; right:0; bottom:0; z-index:-1;
+    color:rgba(0,0,0,0.65); filter:blur(0.6px);
+    transform: translateY(8px) skewY(-6deg) scaleY(0.98);
+    opacity:0.85;
+  }
 
-/* ===== Black Hole ===== */
+  .subtitle{ max-width:840px; color:rgba(255,255,255,0.85); font-size:16px; }
 
-.blackhole{
- position:fixed;
- top:50%;
- left:50%;
- width:500px;
- height:500px;
- transform:translate(-50%,-50%);
- border-radius:50%;
- background:radial-gradient(circle,#00ff99 0%,#002211 40%,black 70%);
- animation:spin 12s linear infinite;
- box-shadow:0 0 200px #00ff99;
-}
+  /* IP block below title */
+  .ip-block{ margin-top:6px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .ip-cta{
+    background:linear-gradient(90deg,var(--g1),var(--g2));
+    padding:12px 20px; border-radius:12px; font-weight:800; color:#021204; border:0; cursor:pointer;
+    box-shadow: 0 12px 40px rgba(6,255,120,0.08);
+    transition: transform .12s ease, box-shadow .12s ease;
+    font-size:18px;
+  }
+  .ip-cta:active{ transform:translateY(2px); }
+  .social-row{ display:flex; gap:10px; margin-top:8px; }
+  .social{
+    padding:10px 14px; border-radius:10px; text-decoration:none; color:white; font-weight:700; display:inline-block;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  }
+  .social.discord{ background: linear-gradient(180deg,#5865F2,#4054D1); }
+  .social.tiktok{ background: linear-gradient(180deg,#ff0050,#ff4d7a); }
 
-@keyframes spin{
- from{transform:translate(-50%,-50%) rotate(0deg);}
- to{transform:translate(-50%,-50%) rotate(360deg);}
-}
+  /* footer small mobile */
+  @media(max-width:680px){
+    .dirt-title{ font-size:34px; }
+    .ip-cta{ font-size:16px; padding:10px 14px; }
+  }
 
-/* ===== Loader ===== */
-
-.loader{
- position:fixed;
- width:100%;
- height:100%;
- background:black;
- display:flex;
- flex-direction:column;
- align-items:center;
- justify-content:center;
- z-index:999;
-}
-
-.logo{
- font-size:70px;
- font-weight:bold;
- text-shadow:0 0 25px #00ff99;
-}
-
-.barBox{
- margin-top:40px;
- width:300px;
-}
-
-.counter{
- text-align:center;
- margin-bottom:8px;
- color:#00ff99;
-}
-
-.bar{
- width:100%;
- height:15px;
- background:#111;
- border-radius:20px;
- overflow:hidden;
-}
-
-.fill{
- width:0%;
- height:100%;
- background:#00ff99;
-}
-
-/* ===== Main ===== */
-
-.main{
- position:absolute;
- top:50%;
- left:50%;
- transform:translate(-50%,-50%);
- text-align:center;
- display:none;
-}
-
-.ip{
- margin-top:20px;
- font-size:20px;
- cursor:pointer;
- background:#00ff99;
- padding:10px 20px;
- border-radius:10px;
- color:black;
-}
-
-.buttons{
- margin-top:20px;
-}
-
-.buttons a{
- margin:10px;
- padding:12px 25px;
- text-decoration:none;
- border-radius:10px;
- color:white;
- font-weight:bold;
-}
-
-.discord{background:#5865F2;}
-.tiktok{background:#ff0050;}
-
-/* ===== Saturn ===== */
-
-.saturn{
- position:fixed;
- width:45px;
- height:45px;
- pointer-events:none;
- border-radius:50%;
- background:radial-gradient(circle,#ffd700,#aa8800);
- box-shadow:0 0 25px gold;
-}
-
-/* Trail Effect */
-
-.trailPiece{
- position:fixed;
- width:30px;
- height:30px;
- border-radius:50%;
- background:rgba(0,255,150,0.3);
- filter:blur(8px);
- pointer-events:none;
- animation:fade 0.6s linear forwards;
-}
-
-@keyframes fade{
- from{opacity:.6; transform:scale(1);}
- to{opacity:0; transform:scale(.3);}
-}
-
+  /* SATURN (SVG placed) */
+  #saturn{ position:fixed; width:36px; height:36px; pointer-events:none; z-index:600; transform:translate(-50%,-50%); filter:drop-shadow(0 10px 24px rgba(0,0,0,0.6)); }
+  /* trail container (we'll add pieces dynamically) */
+  .trail-piece{
+    position:fixed; pointer-events:none; z-index:550; border-radius:999px;
+    background: linear-gradient(90deg, rgba(6,255,120,0.6), rgba(6,255,120,0.08));
+    filter: blur(8px);
+    transform-origin:left center;
+    opacity:0.9;
+  }
 </style>
 </head>
-
 <body>
 
-<div class="stars"></div>
-<div class="blackhole"></div>
+<!-- canvas background (3D-like black hole) -->
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
 
-<!-- Loader -->
-<div class="loader" id="loader">
-
-<div class="logo">DIRTMC</div>
-
-<div class="barBox">
-<div class="counter" id="counter">0%</div>
-
-<div class="bar">
-<div class="fill" id="fill"></div>
-</div>
+<!-- SPLASH LOADER -->
+<div id="splash" role="status" aria-live="polite">
+  <div class="title dirt-title">DirtMC</div>
+  <div class="loader-wrap">
+    <div id="loadCounter" class="load-counter">0%</div>
+    <div class="load-bar">
+      <div id="loadFill" class="load-fill"></div>
+    </div>
+  </div>
 </div>
 
-</div>
+<!-- SATURN SVG (rings + dark ring + subtle highlight) -->
+<svg id="saturn" viewBox="0 0 100 100" aria-hidden="true">
+  <defs>
+    <radialGradient id="satGrad" cx="35%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#fffbe8" stop-opacity="0.95"/>
+      <stop offset="45%" stop-color="#ffd17a" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#8b5a2b" stop-opacity="0.95"/>
+    </radialGradient>
+  </defs>
+  <!-- subtle dark ring shadow (for depth) -->
+  <ellipse cx="50" cy="54" rx="44" ry="14" fill="rgba(0,0,0,0.7)"/>
+  <!-- planet -->
+  <circle cx="50" cy="42" r="14" fill="url(#satGrad)" />
+  <!-- rings (two layers) -->
+  <ellipse cx="50" cy="42" rx="36" ry="10" fill="rgba(10,10,10,0.9)" transform="rotate(-18 50 42)"/>
+  <ellipse cx="50" cy="42" rx="36" ry="10" fill="rgba(6,255,120,0.06)" transform="rotate(-18 50 42)"/>
+</svg>
 
-<!-- Main -->
-<div class="main" id="main">
+<!-- MAIN PAGE CONTENT (hidden until loader done) -->
+<main class="wrap" id="main" aria-hidden="true">
+  <div class="dirt-title" aria-hidden="false">DirtMC</div>
+  <div class="subtitle">Best QuickBox server forever — PvP arenas, fast rounds & legendary prizes.</div>
 
-<h1 style="text-shadow:0 0 30px #00ff99;">
-BEST QUICKBOX SERVER FOREVER
-</h1>
+  <div class="ip-block">
+    <button id="ipBtn" class="ip-cta" aria-label="Copy server IP">dirtmc.pro:21411</button>
+    <div class="social-row">
+      <a class="social discord" href="https://discord.gg/dirtmc" target="_blank" rel="noopener">💬 Discord</a>
+      <a class="social tiktok" href="https://www.tiktok.com/@dirtmc_" target="_blank" rel="noopener">🎵 TikTok</a>
+    </div>
+  </div>
+</main>
 
-<div class="ip" onclick="copyIP()">
-dirtmc.pro:21411
-</div>
-
-<div class="buttons">
-<a class="discord" href="#">Discord</a>
-<a class="tiktok" href="#">TikTok</a>
-</div>
-
-</div>
-
-<div class="saturn" id="saturn"></div>
-
-<audio id="sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_8d33c9a2d5.mp3"></audio>
+<!-- Background sound (black hole impact) -->
+<audio id="bhSound" preload="auto">
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8d33c9a2d5.mp3?filename=ambient-space-110776.mp3" type="audio/mpeg">
+</audio>
 
 <script>
+/* =========================
+   Utilities & elements
+   ========================= */
+const splash = document.getElementById('splash');
+const loadFill = document.getElementById('loadFill');
+const loadCounter = document.getElementById('loadCounter');
+const main = document.getElementById('main');
+const bhSound = document.getElementById('bhSound');
+const ipBtn = document.getElementById('ipBtn');
+const saturn = document.getElementById('saturn');
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
 
-/* ===== Loader ===== */
+/* ====================================
+   SPLASH: staged loading (counter above bar)
+   ==================================== */
+(function splashLoader(){
+  let pct = 0;
+  const stages = [28, 62, 88, 100]; // staged feel
+  function goStage(i=0){
+    if(i >= stages.length){
+      // finish
+      loadFill.style.width = '100%';
+      loadCounter.innerText = '100%';
+      // small delay then hide splash and show main
+      setTimeout(()=> {
+        // attempt to play sound (may be blocked until user interacts)
+        try{ bhSound.currentTime = 0; bhSound.play().catch(()=>{}); }catch(e){}
+        splash.style.transition = 'opacity .6s ease';
+        splash.style.opacity = 0;
+        setTimeout(()=> { splash.remove(); main.style.display = 'flex'; main.setAttribute('aria-hidden','false'); }, 700);
+      }, 300);
+      return;
+    }
+    const target = stages[i];
+    const t = setInterval(()=> {
+      pct += Math.max(0.4, (target - pct) * 0.12);
+      loadFill.style.width = Math.min(pct, target) + '%';
+      loadCounter.innerText = Math.round(Math.min(pct, target)) + '%';
+      if(pct >= target - 0.6){
+        clearInterval(t);
+        setTimeout(()=> goStage(i+1), 220 + Math.random()*360);
+      }
+    }, 30);
+  }
+  goStage(0);
+})();
 
-let fill=document.getElementById("fill");
-let counter=document.getElementById("counter");
-let loader=document.getElementById("loader");
-let main=document.getElementById("main");
-let sound=document.getElementById("sound");
-
-let percent=0;
-
-let load=setInterval(()=>{
- percent++;
- fill.style.width=percent+"%";
- counter.innerText=percent+"%";
-
- if(percent>=100){
- clearInterval(load);
-
- setTimeout(()=>{
- loader.style.display="none";
- main.style.display="block";
- sound.play();
- },500);
- }
-
-},40);
-
-
-/* ===== Copy IP ===== */
-
-function copyIP(){
- navigator.clipboard.writeText("dirtmc.pro:21411");
- alert("IP Copied!");
-}
-
-
-/* ===== Saturn Follow + Trail ===== */
-
-let saturn=document.getElementById("saturn");
-
-let mx=0,my=0;
-let cx=0,cy=0;
-
-document.addEventListener("mousemove",e=>{
- mx=e.clientX;
- my=e.clientY;
+/* =========================
+   Copy IP
+   ========================= */
+ipBtn.addEventListener('click', async ()=>{
+  const old = ipBtn.textContent;
+  try{
+    await navigator.clipboard.writeText('dirtmc.pro:21411');
+    ipBtn.textContent = '✔ Copied';
+  }catch(e){
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = 'dirtmc.pro:21411';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    ipBtn.textContent = '✔ Copied';
+  }
+  setTimeout(()=> ipBtn.textContent = old, 1400);
 });
 
-function createTrail(x,y){
- let trail=document.createElement("div");
- trail.className="trailPiece";
- trail.style.left=x+"px";
- trail.style.top=y+"px";
- document.body.appendChild(trail);
+/* =========================
+   Canvas: 3D-like Black Hole (depth with layered swirl)
+   - particles in spiral, radial gradients, rotating layers
+   - optimized counts based on screen
+   ========================= */
+(function canvasVortex(){
+  let DPR = Math.max(1, window.devicePixelRatio || 1);
+  function resize(){
+    DPR = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width = Math.floor(window.innerWidth * DPR);
+    canvas.height = Math.floor(window.innerHeight * DPR);
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
 
- setTimeout(()=>trail.remove(),600);
-}
+  const W = ()=> window.innerWidth;
+  const H = ()=> window.innerHeight();
+  // particles array
+  let parts = [];
+  function initParticles(){
+    parts = [];
+    const area = window.innerWidth * window.innerHeight;
+    const count = Math.max(160, Math.min(700, Math.floor(area / 1200)));
+    for(let i=0;i<count;i++){
+      const angle = Math.random() * Math.PI * 2;
+      const radius = Math.random() * Math.min(window.innerWidth, window.innerHeight) * (0.18 + Math.random()*0.6);
+      const speed = 0.0009 + Math.random()*0.0030;
+      const size = Math.random() * 2.6 + 0.4;
+      const layer = Math.random(); // depth layer
+      parts.push({angle, radius, speed, size, layer});
+    }
+  }
+  initParticles();
+  window.addEventListener('resize', ()=> { initParticles(); });
 
-function animate(){
- cx+=(mx-cx)*0.12;
- cy+=(my-cy)*0.12;
+  // core render helpers
+  function drawCore(cx, cy, r){
+    const g = ctx.createRadialGradient(cx,cy, r*0.02, cx,cy, r);
+    g.addColorStop(0, 'rgba(6,255,140,0.98)');
+    g.addColorStop(0.18, 'rgba(6,220,110,0.85)');
+    g.addColorStop(0.45, 'rgba(3,80,40,0.6)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath();
+    ctx.fillStyle = g;
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.fill();
+  }
 
- saturn.style.left=cx+"px";
- saturn.style.top=cy+"px";
+  function draw(){
+    const w = window.innerWidth, h = window.innerHeight;
+    ctx.clearRect(0,0,w,h);
 
- createTrail(cx,cy);
+    // dark background grad
+    const bg = ctx.createLinearGradient(0,0,0,h);
+    bg.addColorStop(0, '#000');
+    bg.addColorStop(1, '#00120b');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,w,h);
 
- requestAnimationFrame(animate);
-}
-animate();
+    const cx = w/2, cy = h/2;
+    const coreR = Math.min(w,h) * 0.18;
 
+    // layered swirl - draw particles with depth sorting
+    // farther layers smaller alpha, inner layers brighter
+    parts.forEach(p => {
+      // update angle and radius for sucking-in effect
+      p.angle += p.speed * (1 + p.layer*0.8);
+      p.radius *= (0.999 + p.layer*0.0006);
+      if(p.radius < coreR*0.12) p.radius = coreR + Math.random()*(Math.min(w,h)*0.55);
+
+      const x = cx + Math.cos(p.angle) * p.radius;
+      const y = cy + Math.sin(p.angle) * p.radius;
+
+      // draw trail stroke (subtle)
+      const hx = cx + Math.cos(p.angle - 0.08) * (p.radius + 6);
+      const hy = cy + Math.sin(p.angle - 0.08) * (p.radius + 6);
+
+      // gradient stroke
+      const g = ctx.createLinearGradient(x,y,hx,hy);
+      const alpha = 0.05 + (1 - p.layer) * 0.35;
+      g.addColorStop(0, `rgba(6,255,140,${alpha*0.9})`);
+      g.addColorStop(1, 'rgba(6,255,140,0)');
+
+      ctx.strokeStyle = g;
+      ctx.lineWidth = Math.max(0.3, p.size*0.9);
+      ctx.beginPath();
+      ctx.moveTo(x,y);
+      ctx.lineTo(hx,hy);
+      ctx.stroke();
+
+      // particle
+      ctx.beginPath();
+      const brightness = 0.5 + (1 - p.layer) * 0.8;
+      ctx.fillStyle = `rgba(6,255,140,${0.5 * brightness})`;
+      ctx.arc(x, y, p.size, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    // rotating subtle rings around core (gives 3D feeling)
+    ctx.save();
+    ctx.globalAlpha = 0.08;
+    ctx.translate(cx, cy);
+    const t = performance.now() * 0.00008;
+    for(let i=0;i<3;i++){
+      ctx.rotate(0.002 + i*0.0008 + t*0.02);
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(6,255,120,${0.06 - i*0.015})`;
+      ctx.lineWidth = 2 + (2-i*0.6);
+      ctx.ellipse(0,0, coreR*(1+0.18*i), coreR*(0.52+0.12*i), 0, 0, Math.PI*2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // glowing core
+    drawCore(cx, cy, coreR);
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* =========================
+   SATURN follow + trail (single planet follows mouse with lag; trailing ribbon)
+   - create small elongated divs between previous and current saturn pos
+   ========================= */
+(function saturnFollowTrail(){
+  let mx = window.innerWidth/2, my = window.innerHeight/2;
+  let sx = mx, sy = my;
+  const sat = document.getElementById('saturn');
+
+  window.addEventListener('mousemove', (e)=>{ mx = e.clientX; my = e.clientY; });
+
+  // trail pool container (we just append pieces to body and cleanup)
+  function createTrailPiece(x,y,dx,dy,len,opacity){
+    const el = document.createElement('div');
+    el.className = 'trail-piece';
+    // size: length x thickness
+    const thickness = Math.max(6, Math.min(18, 24 * (1 - Math.min(len/180, 1))));
+    el.style.width = Math.max(24, Math.min(220, len)) + 'px';
+    el.style.height = thickness + 'px';
+    el.style.left = (x - 10) + 'px';
+    el.style.top = (y - thickness/2) + 'px';
+    el.style.opacity = opacity;
+    // rotate to direction
+    const angle = Math.atan2(dy, dx) * (180/Math.PI);
+    el.style.transform = `rotate(${angle}deg) translateX(0)`;
+    el.style.transition = 'opacity 0.6s linear, transform 0.6s linear';
+    document.body.appendChild(el);
+    // fade and remove
+    requestAnimationFrame(()=> {
+      el.style.opacity = 0;
+      el.style.transform = `rotate(${angle}deg) translateX(-40px)`;
+    });
+    setTimeout(()=> el.remove(), 700);
+  }
+
+  // loop
+  function loop(){
+    // lag follow
+    sx += (mx - sx) * 0.12;
+    sy += (my - sy) * 0.12;
+    // position saturn (offset slightly so cursor not blocked)
+    const offset = 22;
+    sat.style.left = (sx + offset) + 'px';
+    sat.style.top = (sy + offset) + 'px';
+
+    // create trail piece along direction
+    const dx = mx - sx;
+    const dy = my - sy;
+    const dist = Math.hypot(dx, dy);
+    if(dist > 6){
+      // create one piece per frame approx, but limit density
+      createTrailPiece(sx, sy, dx, dy, dist, Math.max(0.15, Math.min(0.9, 0.9 - dist/600)));
+    }
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* =========================
+   Accessibility / reduced motion
+   ========================= */
+(function(){
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if(mq.matches){
+    // stop heavy animations if user prefers reduced motion
+    // we won't fully disable canvas so UX stays OK, but could be improved later
+  }
+})();
 </script>
-
 </body>
 </html>
