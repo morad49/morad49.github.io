@@ -4,426 +4,392 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>DirtMC — Legendary</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<!-- Space font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+
 <style>
   :root{
-    --g1:#06ff7a;
-    --g2:#12c86f;
-    --muted:rgba(255,255,255,0.9);
-    --glass: rgba(255,255,255,0.03);
+    --g1: #067a3f; /* dark green */
+    --g2: #36ffb0; /* light green */
+    --b1: #0b63d6;
+    --b2: #7ab8ff;
+    --p1: #b20059;
+    --p2: #ff6fb5;
+    --muted: rgba(255,255,255,0.92);
+    --glass: rgba(255,255,255,0.02);
   }
+
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:#000; color:var(--muted); overflow:hidden;}
-  /* CANVAS fills background */
+  html,body{height:100%;margin:0;background:#000; font-family: "Orbitron", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; color:var(--muted); overflow:hidden; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+
+  /* canvas background */
   #bgCanvas{ position:fixed; inset:0; z-index:0; display:block; background:#000; }
 
-  /* SPLASH (loading cinematic) */
+  /* splash loader */
   #splash{
-    position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column;
+    position:fixed; inset:0; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;
     background:linear-gradient(180deg,#000,#00130a);
   }
-  #splash .title {
-    font-size:64px; font-weight:900; color:var(--g1); letter-spacing:2px;
-    text-transform:uppercase;
-    text-shadow:
-      0 4px 0 rgba(0,0,0,0.6),
-      0 8px 30px rgba(6,255,120,0.12),
-      0 0 50px rgba(6,255,120,0.06);
-    transform: perspective(700px) rotateX(12deg);
+  .splash-title{
+    font-size:64px; color:var(--g2); font-weight:900; letter-spacing:2px;
+    text-shadow: 0 6px 0 rgba(0,0,0,0.6), 0 12px 40px rgba(54,255,176,0.08), 0 0 40px rgba(54,255,176,0.06);
+    transform:perspective(700px) rotateX(10deg);
+    margin-bottom:24px;
   }
-  .loader-wrap{ margin-top:28px; text-align:center; width:420px; max-width:88%; }
-  .load-counter{ color:var(--g1); font-weight:800; margin-bottom:8px; font-size:18px; }
-  .load-bar{
-    height:14px; background:rgba(255,255,255,0.03); border-radius:999px; overflow:hidden; position:relative;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-  }
-  .load-fill{
-    width:0%; height:100%; background:linear-gradient(90deg,var(--g1),var(--g2)); border-radius:999px; transition:width .18s linear;
-    box-shadow: 0 8px 30px rgba(6,255,120,0.12), inset 0 0 18px rgba(6,255,120,0.06);
-  }
+  .loader-wrap{ width:540px; max-width:88%; text-align:center; }
+  #loadCounter{ color:var(--g2); font-weight:800; margin-bottom:10px; font-size:18px; }
+  .load-bar{ height:14px; border-radius:999px; background: rgba(255,255,255,0.03); overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.6); }
+  .load-fill{ width:0%; height:100%; background: linear-gradient(90deg,var(--g1),var(--g2)); border-radius:999px; transition:width .18s linear; box-shadow: inset 0 0 20px rgba(54,255,176,0.06); }
 
-  /* MAIN CONTENT (hidden until loaded) */
-  .wrap{
-    position:relative; z-index:200; min-height:100vh; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; padding:20px; gap:18px; text-align:center;
-  }
+  /* main content */
+  .wrap{ position:relative; z-index:200; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; gap:12px; }
 
-  /* 3D Title */
+  /* title 3D + glow */
   .dirt-title{
-    font-size:clamp(34px,8vw,72px); font-weight:900; line-height:1;
-    color:var(--g1);
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    font-size:clamp(34px,8vw,76px); font-weight:900; line-height:1;
+    color:var(--g2);
     text-shadow:
-      0 6px 0 rgba(0,0,0,0.6),
-      0 10px 40px rgba(6,255,120,0.08),
-      0 0 30px rgba(6,255,120,0.12);
-    transform: translateZ(0);
-    /* faux 3D extrusion */
+      0 6px 0 rgba(0,0,0,0.66),
+      0 10px 40px rgba(6,255,140,0.06),
+      0 0 30px rgba(54,255,176,0.12),
+      0 0 70px rgba(6,255,140,0.06);
     position:relative;
+    transform: translateZ(0);
   }
   .dirt-title::after{
-    content:"DirtMC";
-    position:absolute; left:0; top:7px; right:0; bottom:0; z-index:-1;
-    color:rgba(0,0,0,0.65); filter:blur(0.6px);
-    transform: translateY(8px) skewY(-6deg) scaleY(0.98);
-    opacity:0.85;
-  }
-
-  .subtitle{ max-width:840px; color:rgba(255,255,255,0.85); font-size:16px; }
-
-  /* IP block below title */
-  .ip-block{ margin-top:6px; display:flex; flex-direction:column; align-items:center; gap:8px; }
-  .ip-cta{
-    background:linear-gradient(90deg,var(--g1),var(--g2));
-    padding:12px 20px; border-radius:12px; font-weight:800; color:#021204; border:0; cursor:pointer;
-    box-shadow: 0 12px 40px rgba(6,255,120,0.08);
-    transition: transform .12s ease, box-shadow .12s ease;
-    font-size:18px;
-  }
-  .ip-cta:active{ transform:translateY(2px); }
-  .social-row{ display:flex; gap:10px; margin-top:8px; }
-  .social{
-    padding:10px 14px; border-radius:10px; text-decoration:none; color:white; font-weight:700; display:inline-block;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.45);
-  }
-  .social.discord{ background: linear-gradient(180deg,#5865F2,#4054D1); }
-  .social.tiktok{ background: linear-gradient(180deg,#ff0050,#ff4d7a); }
-
-  /* footer small mobile */
-  @media(max-width:680px){
-    .dirt-title{ font-size:34px; }
-    .ip-cta{ font-size:16px; padding:10px 14px; }
-  }
-
-  /* SATURN (SVG placed) */
-  #saturn{ position:fixed; width:36px; height:36px; pointer-events:none; z-index:600; transform:translate(-50%,-50%); filter:drop-shadow(0 10px 24px rgba(0,0,0,0.6)); }
-  /* trail container (we'll add pieces dynamically) */
-  .trail-piece{
-    position:fixed; pointer-events:none; z-index:550; border-radius:999px;
-    background: linear-gradient(90deg, rgba(6,255,120,0.6), rgba(6,255,120,0.08));
-    filter: blur(8px);
-    transform-origin:left center;
+    content: "DirtMC";
+    position:absolute; left:0; top:8px; right:0; z-index:-1;
+    color: rgba(0,0,0,0.7);
+    transform: translateY(10px) skewY(-6deg) scaleY(0.96); filter:blur(0.5px);
     opacity:0.9;
   }
+
+  .subtitle{ max-width:860px; color:rgba(255,255,255,0.85); font-size:15px; line-height:1.4; }
+
+  /* IP and buttons */
+  .ip-row{ margin-top:8px; display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap; }
+
+  .btn{
+    padding:12px 20px; border-radius:12px; font-weight:800; cursor:pointer; border:0; color:#021204; transition: transform .12s ease, box-shadow .12s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  .btn-green{ background: linear-gradient(90deg,var(--g1),var(--g2)); color:#021204; box-shadow: 0 10px 50px rgba(6,255,140,0.08); }
+  .btn-blue{ background: linear-gradient(90deg,var(--b1),var(--b2)); color:white; box-shadow: 0 10px 50px rgba(11,99,214,0.08); }
+  .btn-pink{ background: linear-gradient(90deg,var(--p1),var(--p2)); color:white; box-shadow: 0 10px 50px rgba(242,70,150,0.08); }
+
+  /* glow on hover */
+  .btn:hover{ transform:translateY(-6px) scale(1.03); }
+  .btn-green:hover{ box-shadow: 0 18px 70px rgba(54,255,176,0.16); }
+  .btn-blue:hover{ box-shadow: 0 18px 70px rgba(122,184,255,0.14); }
+  .btn-pink:hover{ box-shadow: 0 18px 70px rgba(255,111,181,0.14); }
+
+  /* small responsive */
+  @media(max-width:640px){
+    .dirt-title{ font-size:34px; }
+    .subtitle{ padding:0 14px; font-size:14px; }
+    .btn{ padding:10px 14px; font-size:14px; }
+    .loader-wrap{ width:92%; }
+  }
+
+  /* trail pieces (we use few subtle ribbons) */
+  .trail-piece{ position:fixed; pointer-events:none; z-index:150; border-radius:999px; filter:blur(10px); }
 </style>
 </head>
 <body>
 
-<!-- canvas background (3D-like black hole) -->
 <canvas id="bgCanvas" aria-hidden="true"></canvas>
 
-<!-- SPLASH LOADER -->
+<!-- SPLASH -->
 <div id="splash" role="status" aria-live="polite">
-  <div class="title dirt-title">DirtMC</div>
-  <div class="loader-wrap">
-    <div id="loadCounter" class="load-counter">0%</div>
-    <div class="load-bar">
+  <div class="splash-title">DirtMC</div>
+  <div class="loader-wrap" aria-hidden="true">
+    <div id="loadCounter">0%</div>
+    <div class="load-bar" style="margin-top:8px;">
       <div id="loadFill" class="load-fill"></div>
     </div>
   </div>
 </div>
 
-<!-- SATURN SVG (rings + dark ring + subtle highlight) -->
-<svg id="saturn" viewBox="0 0 100 100" aria-hidden="true">
-  <defs>
-    <radialGradient id="satGrad" cx="35%" cy="30%" r="80%">
-      <stop offset="0%" stop-color="#fffbe8" stop-opacity="0.95"/>
-      <stop offset="45%" stop-color="#ffd17a" stop-opacity="0.95"/>
-      <stop offset="100%" stop-color="#8b5a2b" stop-opacity="0.95"/>
-    </radialGradient>
-  </defs>
-  <!-- subtle dark ring shadow (for depth) -->
-  <ellipse cx="50" cy="54" rx="44" ry="14" fill="rgba(0,0,0,0.7)"/>
-  <!-- planet -->
-  <circle cx="50" cy="42" r="14" fill="url(#satGrad)" />
-  <!-- rings (two layers) -->
-  <ellipse cx="50" cy="42" rx="36" ry="10" fill="rgba(10,10,10,0.9)" transform="rotate(-18 50 42)"/>
-  <ellipse cx="50" cy="42" rx="36" ry="10" fill="rgba(6,255,120,0.06)" transform="rotate(-18 50 42)"/>
-</svg>
-
-<!-- MAIN PAGE CONTENT (hidden until loader done) -->
-<main class="wrap" id="main" aria-hidden="true">
-  <div class="dirt-title" aria-hidden="false">DirtMC</div>
+<!-- MAIN -->
+<main class="wrap" id="main" aria-hidden="true" style="display:none;">
+  <div class="dirt-title">DirtMC</div>
   <div class="subtitle">Best QuickBox server forever — PvP arenas, fast rounds & legendary prizes.</div>
 
-  <div class="ip-block">
-    <button id="ipBtn" class="ip-cta" aria-label="Copy server IP">dirtmc.pro:21411</button>
-    <div class="social-row">
-      <a class="social discord" href="https://discord.gg/dirtmc" target="_blank" rel="noopener">💬 Discord</a>
-      <a class="social tiktok" href="https://www.tiktok.com/@dirtmc_" target="_blank" rel="noopener">🎵 TikTok</a>
-    </div>
+  <div class="ip-row" role="group" aria-label="server controls">
+    <button id="ipBtn" class="btn btn-green" aria-label="Copy server IP">dirtmc.pro:21411</button>
+    <a href="https://discord.gg/dirtmc" class="btn btn-blue" target="_blank" rel="noopener">💬 Discord</a>
+    <a href="https://www.tiktok.com/@dirtmc_" class="btn btn-pink" target="_blank" rel="noopener">🎵 TikTok</a>
   </div>
 </main>
 
-<!-- Background sound (black hole impact) -->
-<audio id="bhSound" preload="auto">
-  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8d33c9a2d5.mp3?filename=ambient-space-110776.mp3" type="audio/mpeg">
-</audio>
-
 <script>
-/* =========================
-   Utilities & elements
-   ========================= */
+/* -----------------------------
+   Loader (counter above bar)
+   ----------------------------- */
 const splash = document.getElementById('splash');
 const loadFill = document.getElementById('loadFill');
 const loadCounter = document.getElementById('loadCounter');
 const main = document.getElementById('main');
-const bhSound = document.getElementById('bhSound');
-const ipBtn = document.getElementById('ipBtn');
-const saturn = document.getElementById('saturn');
-const canvas = document.getElementById('bgCanvas');
-const ctx = canvas.getContext('2d');
 
-/* ====================================
-   SPLASH: staged loading (counter above bar)
-   ==================================== */
-(function splashLoader(){
+(function loader(){
   let pct = 0;
-  const stages = [28, 62, 88, 100]; // staged feel
-  function goStage(i=0){
-    if(i >= stages.length){
-      // finish
+  const steps = [28, 62, 88, 100];
+  function stage(i=0){
+    if(i >= steps.length){
       loadFill.style.width = '100%';
       loadCounter.innerText = '100%';
-      // small delay then hide splash and show main
       setTimeout(()=> {
-        // attempt to play sound (may be blocked until user interacts)
-        try{ bhSound.currentTime = 0; bhSound.play().catch(()=>{}); }catch(e){}
         splash.style.transition = 'opacity .6s ease';
         splash.style.opacity = 0;
-        setTimeout(()=> { splash.remove(); main.style.display = 'flex'; main.setAttribute('aria-hidden','false'); }, 700);
-      }, 300);
+        setTimeout(()=> {
+          splash.remove();
+          main.style.display = 'flex';
+          main.setAttribute('aria-hidden','false');
+        }, 600);
+      }, 350);
       return;
     }
-    const target = stages[i];
+    const target = steps[i];
     const t = setInterval(()=> {
       pct += Math.max(0.4, (target - pct) * 0.12);
       loadFill.style.width = Math.min(pct, target) + '%';
       loadCounter.innerText = Math.round(Math.min(pct, target)) + '%';
       if(pct >= target - 0.6){
         clearInterval(t);
-        setTimeout(()=> goStage(i+1), 220 + Math.random()*360);
+        setTimeout(()=> stage(i+1), 220 + Math.random()*360);
       }
-    }, 30);
+    }, 28);
   }
-  goStage(0);
+  stage(0);
 })();
 
-/* =========================
+/* -----------------------------
    Copy IP
-   ========================= */
+   ----------------------------- */
+const ipBtn = document.getElementById('ipBtn');
 ipBtn.addEventListener('click', async ()=>{
   const old = ipBtn.textContent;
   try{
     await navigator.clipboard.writeText('dirtmc.pro:21411');
     ipBtn.textContent = '✔ Copied';
   }catch(e){
-    // fallback
     const ta = document.createElement('textarea');
     ta.value = 'dirtmc.pro:21411';
     document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    ta.remove();
+    ta.select(); document.execCommand('copy'); ta.remove();
     ipBtn.textContent = '✔ Copied';
   }
   setTimeout(()=> ipBtn.textContent = old, 1400);
 });
 
-/* =========================
-   Canvas: 3D-like Black Hole (depth with layered swirl)
-   - particles in spiral, radial gradients, rotating layers
-   - optimized counts based on screen
-   ========================= */
-(function canvasVortex(){
+/* -----------------------------
+   Canvas: Saturn center + orbiting planets & moons
+   - layered glow + orbits lines + rotating rings
+   ----------------------------- */
+(function(){
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
   let DPR = Math.max(1, window.devicePixelRatio || 1);
+  let W = window.innerWidth, H = window.innerHeight;
   function resize(){
     DPR = Math.max(1, window.devicePixelRatio || 1);
-    canvas.width = Math.floor(window.innerWidth * DPR);
-    canvas.height = Math.floor(window.innerHeight * DPR);
-    canvas.style.width = window.innerWidth + 'px';
-    canvas.style.height = window.innerHeight + 'px';
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
     ctx.setTransform(DPR,0,0,DPR,0,0);
   }
   window.addEventListener('resize', resize);
   resize();
 
-  const W = ()=> window.innerWidth;
-  const H = ()=> window.innerHeight();
-  // particles array
-  let parts = [];
-  function initParticles(){
-    parts = [];
-    const area = window.innerWidth * window.innerHeight;
-    const count = Math.max(160, Math.min(700, Math.floor(area / 1200)));
-    for(let i=0;i<count;i++){
-      const angle = Math.random() * Math.PI * 2;
-      const radius = Math.random() * Math.min(window.innerWidth, window.innerHeight) * (0.18 + Math.random()*0.6);
-      const speed = 0.0009 + Math.random()*0.0030;
-      const size = Math.random() * 2.6 + 0.4;
-      const layer = Math.random(); // depth layer
-      parts.push({angle, radius, speed, size, layer});
+  // central Saturn parameters
+  const cx = ()=> window.innerWidth / 2;
+  const cy = ()=> window.innerHeight / 2;
+  const baseCore = Math.min(window.innerWidth, window.innerHeight) * 0.11;
+
+  // create orbiting planets
+  const planets = [];
+  function init(){
+    planets.length = 0;
+    const sizes = [0.9, 1.4, 1.0, 1.8]; // relative size multipliers
+    const colors = [
+      {h:144,s:80,l:45}, // greenish
+      {h:200,s:75,l:48}, // blue
+      {h:320,s:75,l:50}, // pink
+      {h:40,s:70,l:50}   // warm
+    ];
+    for(let i=0;i<4;i++){
+      const orbitR = baseCore * (2.6 + i*1.2) + Math.random()*60;
+      const angle = Math.random()*Math.PI*2;
+      const speed = (0.0006 + Math.random()*0.0012) * (i%2?1:-1); // alternate directions
+      const size = baseCore * 0.28 * sizes[i] * (0.85 + Math.random()*0.3);
+      const col = colors[i % colors.length];
+      // some planets have moons
+      const moons = [];
+      const moonCount = (i===1? 2 : (i===2?1:0));
+      for(let m=0;m<moonCount;m++){
+        moons.push({
+          angle: Math.random()*Math.PI*2,
+          orbitR: (size * 0.9) + 20 + m*10,
+          speed: 0.002 + Math.random()*0.002,
+          size: Math.max(2, size*0.08*(0.8 + Math.random()*0.6))
+        });
+      }
+      planets.push({orbitR, angle, speed, size, col, moons});
     }
   }
-  initParticles();
-  window.addEventListener('resize', ()=> { initParticles(); });
+  init();
+  window.addEventListener('resize', ()=> { init(); });
 
-  // core render helpers
-  function drawCore(cx, cy, r){
-    const g = ctx.createRadialGradient(cx,cy, r*0.02, cx,cy, r);
-    g.addColorStop(0, 'rgba(6,255,140,0.98)');
-    g.addColorStop(0.18, 'rgba(6,220,110,0.85)');
-    g.addColorStop(0.45, 'rgba(3,80,40,0.6)');
-    g.addColorStop(1, 'rgba(0,0,0,0)');
+  // stars background (light)
+  const stars = [];
+  function initStars(){
+    stars.length = 0;
+    const count = Math.max(80, Math.floor((window.innerWidth * window.innerHeight)/22000));
+    for(let i=0;i<count;i++){
+      stars.push({
+        x: Math.random()*window.innerWidth,
+        y: Math.random()*window.innerHeight,
+        s: Math.random()*1.6+0.4,
+        a: 0.2 + Math.random()*0.9
+      });
+    }
+  }
+  initStars();
+  window.addEventListener('resize', initStars);
+
+  // draw core saturn with ring
+  function drawSaturn(cxP, cyP, coreR){
+    // planet gradient
+    const g = ctx.createRadialGradient(cxP - coreR*0.3, cyP - coreR*0.3, coreR*0.08, cxP, cyP, coreR);
+    g.addColorStop(0, 'rgba(255,255,255,0.95)');
+    g.addColorStop(0.25, 'rgba(255,220,150,0.95)');
+    g.addColorStop(0.6, 'rgba(180,110,60,0.95)');
+    g.addColorStop(1, 'rgba(80,40,20,0.95)');
     ctx.beginPath();
     ctx.fillStyle = g;
-    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.arc(cxP, cyP, coreR, 0, Math.PI*2);
+    ctx.fill();
+
+    // ring (two layers) — rotated ellipse
+    ctx.save();
+    ctx.translate(cxP, cyP);
+    const rot = -18 * (Math.PI/180);
+    ctx.rotate(rot);
+    // outer dark ring
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(6,6,6,0.92)';
+    ctx.ellipse(0, 0, coreR*2.6, coreR*0.7, 0, 0, Math.PI*2);
+    ctx.fill();
+    // inner glow ring
+    ctx.beginPath();
+    const ringGrad = ctx.createLinearGradient(-coreR*2.6,0, coreR*2.6,0);
+    ringGrad.addColorStop(0, 'rgba(6,255,140,0.06)');
+    ringGrad.addColorStop(0.5, 'rgba(6,255,140,0.18)');
+    ringGrad.addColorStop(1, 'rgba(6,255,140,0.06)');
+    ctx.fillStyle = ringGrad;
+    ctx.ellipse(0,0, coreR*2.5, coreR*0.6, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // subtle core glow
+    ctx.beginPath();
+    const cg = ctx.createRadialGradient(cxP,cyP, coreR*0.1, cxP,cyP, coreR*2.2);
+    cg.addColorStop(0, 'rgba(6,255,140,0.06)');
+    cg.addColorStop(0.45, 'rgba(6,255,140,0.02)');
+    cg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = cg;
+    ctx.arc(cxP, cyP, coreR*2.6, 0, Math.PI*2);
     ctx.fill();
   }
 
+  // main draw
   function draw(){
-    const w = window.innerWidth, h = window.innerHeight;
-    ctx.clearRect(0,0,w,h);
+    const Ww = window.innerWidth, Hh = window.innerHeight;
+    ctx.clearRect(0,0,Ww,Hh);
 
-    // dark background grad
-    const bg = ctx.createLinearGradient(0,0,0,h);
-    bg.addColorStop(0, '#000');
-    bg.addColorStop(1, '#00120b');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0,0,w,h);
-
-    const cx = w/2, cy = h/2;
-    const coreR = Math.min(w,h) * 0.18;
-
-    // layered swirl - draw particles with depth sorting
-    // farther layers smaller alpha, inner layers brighter
-    parts.forEach(p => {
-      // update angle and radius for sucking-in effect
-      p.angle += p.speed * (1 + p.layer*0.8);
-      p.radius *= (0.999 + p.layer*0.0006);
-      if(p.radius < coreR*0.12) p.radius = coreR + Math.random()*(Math.min(w,h)*0.55);
-
-      const x = cx + Math.cos(p.angle) * p.radius;
-      const y = cy + Math.sin(p.angle) * p.radius;
-
-      // draw trail stroke (subtle)
-      const hx = cx + Math.cos(p.angle - 0.08) * (p.radius + 6);
-      const hy = cy + Math.sin(p.angle - 0.08) * (p.radius + 6);
-
-      // gradient stroke
-      const g = ctx.createLinearGradient(x,y,hx,hy);
-      const alpha = 0.05 + (1 - p.layer) * 0.35;
-      g.addColorStop(0, `rgba(6,255,140,${alpha*0.9})`);
-      g.addColorStop(1, 'rgba(6,255,140,0)');
-
-      ctx.strokeStyle = g;
-      ctx.lineWidth = Math.max(0.3, p.size*0.9);
+    // starfield
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,Ww,Hh);
+    for(const s of stars){
       ctx.beginPath();
-      ctx.moveTo(x,y);
-      ctx.lineTo(hx,hy);
-      ctx.stroke();
-
-      // particle
-      ctx.beginPath();
-      const brightness = 0.5 + (1 - p.layer) * 0.8;
-      ctx.fillStyle = `rgba(6,255,140,${0.5 * brightness})`;
-      ctx.arc(x, y, p.size, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+      ctx.arc(s.x, s.y, s.s, 0, Math.PI*2);
       ctx.fill();
-    });
+    }
 
-    // rotating subtle rings around core (gives 3D feeling)
+    // center coordinates and core radius recomputed
+    const centerX = window.innerWidth/2;
+    const centerY = window.innerHeight/2;
+    const coreR = Math.min(window.innerWidth, window.innerHeight) * 0.11;
+
+    // orbit paths (faint)
     ctx.save();
-    ctx.globalAlpha = 0.08;
-    ctx.translate(cx, cy);
-    const t = performance.now() * 0.00008;
-    for(let i=0;i<3;i++){
-      ctx.rotate(0.002 + i*0.0008 + t*0.02);
+    ctx.translate(centerX, centerY);
+    ctx.globalAlpha = 0.06;
+    for(let i=0;i<planets.length;i++){
+      const pr = planets[i].orbitR;
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(6,255,120,${0.06 - i*0.015})`;
-      ctx.lineWidth = 2 + (2-i*0.6);
-      ctx.ellipse(0,0, coreR*(1+0.18*i), coreR*(0.52+0.12*i), 0, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(120,220,160,0.06)`;
+      ctx.lineWidth = 1;
+      ctx.ellipse(0,0, pr, pr*0.45, 0, 0, Math.PI*2);
       ctx.stroke();
     }
     ctx.restore();
+    ctx.globalAlpha = 1;
 
-    // glowing core
-    drawCore(cx, cy, coreR);
+    // update & draw planets and their moons
+    for(const p of planets){
+      p.angle += p.speed;
+      // convert elliptical orbit
+      const orbitX = centerX + Math.cos(p.angle) * p.orbitR;
+      const orbitY = centerY + Math.sin(p.angle) * (p.orbitR * 0.45);
+
+      // planet body
+      const col = p.col;
+      // planet gradient
+      const pg = ctx.createRadialGradient(orbitX - p.size*0.4, orbitY - p.size*0.4, p.size*0.08, orbitX, orbitY, p.size*1.6);
+      pg.addColorStop(0, `rgba(255,255,255,0.9)`);
+      pg.addColorStop(0.25, `hsla(${col.h}, ${col.s}%, ${col.l}%, 0.98)`);
+      pg.addColorStop(1, `hsla(${col.h-20}, ${col.s-10}%, ${col.l-20}%, 0.95)`);
+      ctx.beginPath();
+      ctx.fillStyle = pg;
+      ctx.arc(orbitX, orbitY, p.size, 0, Math.PI*2);
+      ctx.fill();
+
+      // subtle rim light
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = Math.max(1, p.size*0.09);
+      ctx.arc(orbitX, orbitY, p.size+ (p.size*0.06), 0, Math.PI*2);
+      ctx.stroke();
+
+      // if planet has moons
+      if(p.moons && p.moons.length){
+        for(const m of p.moons){
+          m.angle += m.speed;
+          const mx = orbitX + Math.cos(m.angle) * m.orbitR;
+          const my = orbitY + Math.sin(m.angle) * (m.orbitR*0.6);
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(220,220,220,0.96)';
+          ctx.arc(mx, my, m.size, 0, Math.PI*2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // draw central saturn last (on top)
+    drawSaturn(centerX, centerY, coreR);
 
     requestAnimationFrame(draw);
   }
   draw();
 })();
 
-/* =========================
-   SATURN follow + trail (single planet follows mouse with lag; trailing ribbon)
-   - create small elongated divs between previous and current saturn pos
-   ========================= */
-(function saturnFollowTrail(){
-  let mx = window.innerWidth/2, my = window.innerHeight/2;
-  let sx = mx, sy = my;
-  const sat = document.getElementById('saturn');
-
-  window.addEventListener('mousemove', (e)=>{ mx = e.clientX; my = e.clientY; });
-
-  // trail pool container (we just append pieces to body and cleanup)
-  function createTrailPiece(x,y,dx,dy,len,opacity){
-    const el = document.createElement('div');
-    el.className = 'trail-piece';
-    // size: length x thickness
-    const thickness = Math.max(6, Math.min(18, 24 * (1 - Math.min(len/180, 1))));
-    el.style.width = Math.max(24, Math.min(220, len)) + 'px';
-    el.style.height = thickness + 'px';
-    el.style.left = (x - 10) + 'px';
-    el.style.top = (y - thickness/2) + 'px';
-    el.style.opacity = opacity;
-    // rotate to direction
-    const angle = Math.atan2(dy, dx) * (180/Math.PI);
-    el.style.transform = `rotate(${angle}deg) translateX(0)`;
-    el.style.transition = 'opacity 0.6s linear, transform 0.6s linear';
-    document.body.appendChild(el);
-    // fade and remove
-    requestAnimationFrame(()=> {
-      el.style.opacity = 0;
-      el.style.transform = `rotate(${angle}deg) translateX(-40px)`;
-    });
-    setTimeout(()=> el.remove(), 700);
-  }
-
-  // loop
-  function loop(){
-    // lag follow
-    sx += (mx - sx) * 0.12;
-    sy += (my - sy) * 0.12;
-    // position saturn (offset slightly so cursor not blocked)
-    const offset = 22;
-    sat.style.left = (sx + offset) + 'px';
-    sat.style.top = (sy + offset) + 'px';
-
-    // create trail piece along direction
-    const dx = mx - sx;
-    const dy = my - sy;
-    const dist = Math.hypot(dx, dy);
-    if(dist > 6){
-      // create one piece per frame approx, but limit density
-      createTrailPiece(sx, sy, dx, dy, dist, Math.max(0.15, Math.min(0.9, 0.9 - dist/600)));
-    }
-
-    requestAnimationFrame(loop);
-  }
-  loop();
-})();
-
-/* =========================
-   Accessibility / reduced motion
-   ========================= */
-(function(){
-  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if(mq.matches){
-    // stop heavy animations if user prefers reduced motion
-    // we won't fully disable canvas so UX stays OK, but could be improved later
-  }
-})();
+/* End script */
 </script>
 </body>
 </html>
