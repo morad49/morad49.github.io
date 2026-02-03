@@ -1,100 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>DirtMC — Legendary</title>
 
-<!-- Space font -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --g1: #067a3f; /* dark green */
-    --g2: #36ffb0; /* light green */
-    --b1: #0b63d6;
-    --b2: #7ab8ff;
-    --p1: #b20059;
-    --p2: #ff6fb5;
-    --muted: rgba(255,255,255,0.92);
+    --g1:#06ff7a;
+    --g2:#12c86f;
+    --bg-dark: #000005;
     --glass: rgba(255,255,255,0.02);
+    --muted: rgba(230,255,240,0.95);
   }
-
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:#000; font-family: "Orbitron", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; color:var(--muted); overflow:hidden; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+  html,body{height:100%;margin:0;background:var(--bg-dark); font-family:"Orbitron", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; color:var(--muted); overflow:hidden; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
 
-  /* canvas background */
-  #bgCanvas{ position:fixed; inset:0; z-index:0; display:block; background:#000; }
+  /* canvas backdrop */
+  canvas#bgCanvas{ position:fixed; inset:0; z-index:0; display:block; background: radial-gradient(ellipse at center, rgba(8,12,6,0.85) 0%, rgba(0,0,0,0.95) 60%); }
 
   /* splash loader */
   #splash{
-    position:fixed; inset:0; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column;
     background:linear-gradient(180deg,#000,#00130a);
   }
   .splash-title{
     font-size:64px; color:var(--g2); font-weight:900; letter-spacing:2px;
-    text-shadow: 0 6px 0 rgba(0,0,0,0.6), 0 12px 40px rgba(54,255,176,0.08), 0 0 40px rgba(54,255,176,0.06);
+    text-shadow: 0 6px 0 rgba(0,0,0,0.6), 0 18px 60px rgba(6,255,140,0.08), 0 0 48px rgba(6,255,140,0.06);
     transform:perspective(700px) rotateX(10deg);
     margin-bottom:24px;
   }
-  .loader-wrap{ width:540px; max-width:88%; text-align:center; }
+  .loader-wrap{ width:520px; max-width:88%; text-align:center; }
   #loadCounter{ color:var(--g2); font-weight:800; margin-bottom:10px; font-size:18px; }
   .load-bar{ height:14px; border-radius:999px; background: rgba(255,255,255,0.03); overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.6); }
   .load-fill{ width:0%; height:100%; background: linear-gradient(90deg,var(--g1),var(--g2)); border-radius:999px; transition:width .18s linear; box-shadow: inset 0 0 20px rgba(54,255,176,0.06); }
 
-  /* main content */
-  .wrap{ position:relative; z-index:200; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; gap:12px; }
+  /* main wrap */
+  .wrap{ position:relative; z-index:300; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center; padding:20px; }
 
-  /* title 3D + glow */
-  .dirt-title{
-    font-size:clamp(34px,8vw,76px); font-weight:900; line-height:1;
-    color:var(--g2);
+  /* Title 3D + strong glow */
+  .title{
+    font-size:clamp(34px,8vw,72px); font-weight:900; color:var(--g2);
     text-shadow:
-      0 6px 0 rgba(0,0,0,0.66),
-      0 10px 40px rgba(6,255,140,0.06),
-      0 0 30px rgba(54,255,176,0.12),
-      0 0 70px rgba(6,255,140,0.06);
+      0 8px 0 rgba(0,0,0,0.7),
+      0 20px 60px rgba(6,255,140,0.06),
+      0 0 36px rgba(6,255,140,0.12),
+      0 0 96px rgba(6,255,140,0.06);
     position:relative;
     transform: translateZ(0);
   }
-  .dirt-title::after{
-    content: "DirtMC";
-    position:absolute; left:0; top:8px; right:0; z-index:-1;
-    color: rgba(0,0,0,0.7);
-    transform: translateY(10px) skewY(-6deg) scaleY(0.96); filter:blur(0.5px);
-    opacity:0.9;
+  .title::after{
+    content:"DirtMC";
+    position:absolute; left:0; top:10px; right:0; z-index:-1;
+    color: rgba(0,0,0,0.7); transform: translateY(12px) skewY(-6deg) scaleY(0.96); filter:blur(0.6px); opacity:0.9;
   }
 
-  .subtitle{ max-width:860px; color:rgba(255,255,255,0.85); font-size:15px; line-height:1.4; }
-
-  /* IP and buttons */
-  .ip-row{ margin-top:8px; display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap; }
-
+  /* IP + socials row */
+  .row{ display:flex; gap:12px; align-items:center; justify-content:center; margin-top:6px; flex-wrap:wrap; }
   .btn{
-    padding:12px 20px; border-radius:12px; font-weight:800; cursor:pointer; border:0; color:#021204; transition: transform .12s ease, box-shadow .12s ease;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding:12px 20px; border-radius:12px; font-weight:800; cursor:pointer; border:0; transition:transform .12s ease, box-shadow .12s ease;
+    color:white; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn:active{ transform: translateY(2px); }
+  .btn-green{ background: linear-gradient(90deg,#025d33,var(--g2)); box-shadow: 0 14px 50px rgba(6,255,140,0.08); color:#051105; }
+  .btn-blue{ background: linear-gradient(90deg,#063e9e,#7ab8ff); box-shadow: 0 14px 50px rgba(122,184,255,0.08); }
+  .btn-pink{ background: linear-gradient(90deg,#a1004b,#ff6fb5); box-shadow: 0 14px 50px rgba(255,111,181,0.08); }
+  /* strong glow on hover */
+  .btn:hover{ transform:translateY(-8px) scale(1.03); }
+  .btn-green:hover{ box-shadow: 0 30px 120px rgba(6,255,140,0.18); }
+  .btn-blue:hover{ box-shadow: 0 30px 120px rgba(122,184,255,0.14); }
+  .btn-pink:hover{ box-shadow: 0 30px 120px rgba(255,111,181,0.14); }
+
+  /* trail piece style (created dynamically) */
+  .trail-piece{ position:fixed; pointer-events:none; z-index:250; border-radius:999px; filter: blur(8px); transform-origin:left center; opacity:1; }
+
+  /* short "shock" CSS for page shake & blur */
+  .shock-anim{
+    animation:shockTranslate .6s cubic-bezier(.25,.46,.45,.94);
+    filter: blur(1.2px) contrast(1.05);
+  }
+  @keyframes shockTranslate{
+    0%{ transform: translate(0,0); }
+    10%{ transform: translate(-6px,4px); }
+    30%{ transform: translate(6px,-6px); }
+    50%{ transform: translate(-4px,4px); }
+    70%{ transform: translate(4px,-2px); }
+    100%{ transform: translate(0,0); }
   }
 
-  .btn-green{ background: linear-gradient(90deg,var(--g1),var(--g2)); color:#021204; box-shadow: 0 10px 50px rgba(6,255,140,0.08); }
-  .btn-blue{ background: linear-gradient(90deg,var(--b1),var(--b2)); color:white; box-shadow: 0 10px 50px rgba(11,99,214,0.08); }
-  .btn-pink{ background: linear-gradient(90deg,var(--p1),var(--p2)); color:white; box-shadow: 0 10px 50px rgba(242,70,150,0.08); }
-
-  /* glow on hover */
-  .btn:hover{ transform:translateY(-6px) scale(1.03); }
-  .btn-green:hover{ box-shadow: 0 18px 70px rgba(54,255,176,0.16); }
-  .btn-blue:hover{ box-shadow: 0 18px 70px rgba(122,184,255,0.14); }
-  .btn-pink:hover{ box-shadow: 0 18px 70px rgba(255,111,181,0.14); }
-
-  /* small responsive */
   @media(max-width:640px){
-    .dirt-title{ font-size:34px; }
-    .subtitle{ padding:0 14px; font-size:14px; }
+    .title{ font-size:36px; }
     .btn{ padding:10px 14px; font-size:14px; }
-    .loader-wrap{ width:92%; }
   }
-
-  /* trail pieces (we use few subtle ribbons) */
-  .trail-piece{ position:fixed; pointer-events:none; z-index:150; border-radius:999px; filter:blur(10px); }
 </style>
 </head>
 <body>
@@ -104,7 +103,7 @@
 <!-- SPLASH -->
 <div id="splash" role="status" aria-live="polite">
   <div class="splash-title">DirtMC</div>
-  <div class="loader-wrap" aria-hidden="true">
+  <div class="loader-wrap">
     <div id="loadCounter">0%</div>
     <div class="load-bar" style="margin-top:8px;">
       <div id="loadFill" class="load-fill"></div>
@@ -114,60 +113,53 @@
 
 <!-- MAIN -->
 <main class="wrap" id="main" aria-hidden="true" style="display:none;">
-  <div class="dirt-title">DirtMC</div>
-  <div class="subtitle">Best QuickBox server forever — PvP arenas, fast rounds & legendary prizes.</div>
+  <div class="title">DirtMC</div>
 
-  <div class="ip-row" role="group" aria-label="server controls">
+  <div class="row">
     <button id="ipBtn" class="btn btn-green" aria-label="Copy server IP">dirtmc.pro:21411</button>
-    <a href="https://discord.gg/dirtmc" class="btn btn-blue" target="_blank" rel="noopener">💬 Discord</a>
-    <a href="https://www.tiktok.com/@dirtmc_" class="btn btn-pink" target="_blank" rel="noopener">🎵 TikTok</a>
+    <a class="btn btn-blue" href="https://discord.gg/dirtmc" target="_blank" rel="noopener">💬 Discord</a>
+    <a class="btn btn-pink" href="https://www.tiktok.com/@dirtmc_" target="_blank" rel="noopener">🎵 TikTok</a>
   </div>
 </main>
 
 <script>
-/* -----------------------------
+/* ----------------------------
    Loader (counter above bar)
-   ----------------------------- */
+   ---------------------------- */
 const splash = document.getElementById('splash');
 const loadFill = document.getElementById('loadFill');
 const loadCounter = document.getElementById('loadCounter');
 const main = document.getElementById('main');
 
-(function loader(){
+(function splashLoader(){
   let pct = 0;
-  const steps = [28, 62, 88, 100];
-  function stage(i=0){
-    if(i >= steps.length){
-      loadFill.style.width = '100%';
-      loadCounter.innerText = '100%';
+  const stages = [28, 62, 88, 100];
+  function go(i=0){
+    if(i >= stages.length){
+      loadFill.style.width = '100%'; loadCounter.innerText = '100%';
       setTimeout(()=> {
-        splash.style.transition = 'opacity .6s ease';
-        splash.style.opacity = 0;
-        setTimeout(()=> {
-          splash.remove();
-          main.style.display = 'flex';
-          main.setAttribute('aria-hidden','false');
-        }, 600);
-      }, 350);
+        splash.style.transition = 'opacity .6s ease'; splash.style.opacity = 0;
+        setTimeout(()=> { splash.remove(); main.style.display = 'flex'; main.setAttribute('aria-hidden','false'); }, 700);
+      }, 300);
       return;
     }
-    const target = steps[i];
+    const target = stages[i];
     const t = setInterval(()=> {
-      pct += Math.max(0.4, (target - pct) * 0.12);
+      pct += Math.max(0.35, (target - pct) * 0.12);
       loadFill.style.width = Math.min(pct, target) + '%';
       loadCounter.innerText = Math.round(Math.min(pct, target)) + '%';
-      if(pct >= target - 0.6){
+      if(pct >= target - 0.5){
         clearInterval(t);
-        setTimeout(()=> stage(i+1), 220 + Math.random()*360);
+        setTimeout(()=> go(i+1), 220 + Math.random()*360);
       }
     }, 28);
   }
-  stage(0);
+  go(0);
 })();
 
-/* -----------------------------
-   Copy IP
-   ----------------------------- */
+/* ----------------------------
+   Copy IP button
+   ---------------------------- */
 const ipBtn = document.getElementById('ipBtn');
 ipBtn.addEventListener('click', async ()=>{
   const old = ipBtn.textContent;
@@ -175,221 +167,294 @@ ipBtn.addEventListener('click', async ()=>{
     await navigator.clipboard.writeText('dirtmc.pro:21411');
     ipBtn.textContent = '✔ Copied';
   }catch(e){
-    const ta = document.createElement('textarea');
-    ta.value = 'dirtmc.pro:21411';
-    document.body.appendChild(ta);
+    const ta = document.createElement('textarea'); ta.value='dirtmc.pro:21411'; document.body.appendChild(ta);
     ta.select(); document.execCommand('copy'); ta.remove();
     ipBtn.textContent = '✔ Copied';
   }
   setTimeout(()=> ipBtn.textContent = old, 1400);
 });
 
-/* -----------------------------
-   Canvas: Saturn center + orbiting planets & moons
-   - layered glow + orbits lines + rotating rings
-   ----------------------------- */
+/* ----------------------------
+   Canvas: Black Hole center + meteors + radial waves every 60s
+   - optimized for performance
+   ---------------------------- */
 (function(){
   const canvas = document.getElementById('bgCanvas');
   const ctx = canvas.getContext('2d');
+
+  // DPR & resize
   let DPR = Math.max(1, window.devicePixelRatio || 1);
-  let W = window.innerWidth, H = window.innerHeight;
   function resize(){
     DPR = Math.max(1, window.devicePixelRatio || 1);
-    W = window.innerWidth; H = window.innerHeight;
-    canvas.width = Math.floor(W * DPR);
-    canvas.height = Math.floor(H * DPR);
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
+    canvas.width = Math.floor(window.innerWidth * DPR);
+    canvas.height = Math.floor(window.innerHeight * DPR);
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
     ctx.setTransform(DPR,0,0,DPR,0,0);
   }
   window.addEventListener('resize', resize);
   resize();
 
-  // central Saturn parameters
-  const cx = ()=> window.innerWidth / 2;
-  const cy = ()=> window.innerHeight / 2;
-  const baseCore = Math.min(window.innerWidth, window.innerHeight) * 0.11;
+  const W = ()=> window.innerWidth;
+  const H = ()=> window.innerHeight;
+  const cx = ()=> W()/2;
+  const cy = ()=> H()/2;
 
-  // create orbiting planets
-  const planets = [];
-  function init(){
-    planets.length = 0;
-    const sizes = [0.9, 1.4, 1.0, 1.8]; // relative size multipliers
-    const colors = [
-      {h:144,s:80,l:45}, // greenish
-      {h:200,s:75,l:48}, // blue
-      {h:320,s:75,l:50}, // pink
-      {h:40,s:70,l:50}   // warm
-    ];
-    for(let i=0;i<4;i++){
-      const orbitR = baseCore * (2.6 + i*1.2) + Math.random()*60;
-      const angle = Math.random()*Math.PI*2;
-      const speed = (0.0006 + Math.random()*0.0012) * (i%2?1:-1); // alternate directions
-      const size = baseCore * 0.28 * sizes[i] * (0.85 + Math.random()*0.3);
-      const col = colors[i % colors.length];
-      // some planets have moons
-      const moons = [];
-      const moonCount = (i===1? 2 : (i===2?1:0));
-      for(let m=0;m<moonCount;m++){
-        moons.push({
-          angle: Math.random()*Math.PI*2,
-          orbitR: (size * 0.9) + 20 + m*10,
-          speed: 0.002 + Math.random()*0.002,
-          size: Math.max(2, size*0.08*(0.8 + Math.random()*0.6))
-        });
-      }
-      planets.push({orbitR, angle, speed, size, col, moons});
-    }
-  }
-  init();
-  window.addEventListener('resize', ()=> { init(); });
-
-  // stars background (light)
+  // stars background
   const stars = [];
   function initStars(){
     stars.length = 0;
-    const count = Math.max(80, Math.floor((window.innerWidth * window.innerHeight)/22000));
+    const count = Math.max(120, Math.floor((W()*H())/25000));
     for(let i=0;i<count;i++){
       stars.push({
-        x: Math.random()*window.innerWidth,
-        y: Math.random()*window.innerHeight,
-        s: Math.random()*1.6+0.4,
-        a: 0.2 + Math.random()*0.9
+        x: Math.random()*W(),
+        y: Math.random()*H(),
+        r: Math.random()*1.8 + 0.2,
+        a: Math.random()*0.9 + 0.2
       });
     }
   }
   initStars();
   window.addEventListener('resize', initStars);
 
-  // draw core saturn with ring
-  function drawSaturn(cxP, cyP, coreR){
-    // planet gradient
-    const g = ctx.createRadialGradient(cxP - coreR*0.3, cyP - coreR*0.3, coreR*0.08, cxP, cyP, coreR);
-    g.addColorStop(0, 'rgba(255,255,255,0.95)');
-    g.addColorStop(0.25, 'rgba(255,220,150,0.95)');
-    g.addColorStop(0.6, 'rgba(180,110,60,0.95)');
-    g.addColorStop(1, 'rgba(80,40,20,0.95)');
-    ctx.beginPath();
-    ctx.fillStyle = g;
-    ctx.arc(cxP, cyP, coreR, 0, Math.PI*2);
-    ctx.fill();
+  // black hole particles (spiral)
+  let particles = [];
+  function initParticles(){
+    particles = [];
+    const area = W()*H();
+    const count = Math.max(260, Math.min(900, Math.floor(area / 1400)));
+    for(let i=0;i<count;i++){
+      particles.push({
+        angle: Math.random()*Math.PI*2,
+        radius: Math.random()*Math.min(W(),H())*0.6,
+        speed: 0.0006 + Math.random()*0.003,
+        size: Math.random()*2.2 + 0.2,
+        hue: 150 + Math.random()*40,
+        layer: Math.random()
+      });
+    }
+  }
+  initParticles();
+  window.addEventListener('resize', initParticles);
 
-    // ring (two layers) — rotated ellipse
-    ctx.save();
-    ctx.translate(cxP, cyP);
-    const rot = -18 * (Math.PI/180);
-    ctx.rotate(rot);
-    // outer dark ring
-    ctx.beginPath();
-    ctx.fillStyle = 'rgba(6,6,6,0.92)';
-    ctx.ellipse(0, 0, coreR*2.6, coreR*0.7, 0, 0, Math.PI*2);
-    ctx.fill();
-    // inner glow ring
-    ctx.beginPath();
-    const ringGrad = ctx.createLinearGradient(-coreR*2.6,0, coreR*2.6,0);
-    ringGrad.addColorStop(0, 'rgba(6,255,140,0.06)');
-    ringGrad.addColorStop(0.5, 'rgba(6,255,140,0.18)');
-    ringGrad.addColorStop(1, 'rgba(6,255,140,0.06)');
-    ctx.fillStyle = ringGrad;
-    ctx.ellipse(0,0, coreR*2.5, coreR*0.6, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-
-    // subtle core glow
-    ctx.beginPath();
-    const cg = ctx.createRadialGradient(cxP,cyP, coreR*0.1, cxP,cyP, coreR*2.2);
-    cg.addColorStop(0, 'rgba(6,255,140,0.06)');
-    cg.addColorStop(0.45, 'rgba(6,255,140,0.02)');
-    cg.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = cg;
-    ctx.arc(cxP, cyP, coreR*2.6, 0, Math.PI*2);
-    ctx.fill();
+  // meteors (niazak) - streaks with speed
+  const meteors = [];
+  function spawnMeteor(){
+    // spawn from random edge, fly across
+    const side = Math.floor(Math.random()*4);
+    let x,y, vx, vy;
+    const speed = 6 + Math.random()*10;
+    const len = 80 + Math.random()*200;
+    if(side===0){ // top
+      x = Math.random()*W(); y = -40;
+      vx = (Math.random()-0.5)*3; vy = speed;
+    } else if(side===1){ // right
+      x = W()+40; y = Math.random()*H();
+      vx = -speed; vy = (Math.random()-0.5)*4;
+    } else if(side===2){ // bottom
+      x = Math.random()*W(); y = H()+40;
+      vx = (Math.random()-0.5)*3; vy = -speed;
+    } else { // left
+      x = -40; y = Math.random()*H();
+      vx = speed; vy = (Math.random()-0.5)*4;
+    }
+    meteors.push({x,y,vx,vy,len,life:0,ttl: Math.floor(100 + Math.random()*200), hue: 30 + Math.random()*120});
   }
 
-  // main draw
-  function draw(){
-    const Ww = window.innerWidth, Hh = window.innerHeight;
-    ctx.clearRect(0,0,Ww,Hh);
+  // spawn meteors intermittently
+  setInterval(()=> {
+    // spawn 0-2 meteors depending on screen size
+    const n = (Math.random() > 0.6 ? 1 : 0) + (Math.random()>0.9?1:0);
+    for(let i=0;i<n;i++) spawnMeteor();
+  }, 600);
 
-    // starfield
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0,0,Ww,Hh);
-    for(const s of stars){
+  // radial waves (shock) array
+  const waves = [];
+  function spawnWave(){
+    waves.push({r:30, maxR: Math.min(W(),H())*0.95, alpha:0.85});
+    // trigger screen shock class for brief time
+    document.documentElement.classList.add('shock-anim');
+    setTimeout(()=> document.documentElement.classList.remove('shock-anim'), 700);
+  }
+  // spawn every 60s
+  const WAVE_INTERVAL_MS = 60000; // 60s
+  // start after 12s then every 60s
+  setTimeout(()=> { spawnWave(); setInterval(spawnWave, WAVE_INTERVAL_MS); }, 12000);
+
+  // initial smaller wave to show effect a bit earlier
+  setTimeout(()=> spawnWave(), 4000);
+
+  // main draw loop
+  function draw(){
+    ctx.clearRect(0,0,W(),H());
+
+    // deep space gradient
+    const bgGrad = ctx.createLinearGradient(0,0,H(),H());
+    bgGrad.addColorStop(0, '#00000a');
+    bgGrad.addColorStop(1, '#001110');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0,0,W(),H());
+
+    // faint stars
+    for(let s of stars){
       ctx.beginPath();
-      ctx.fillStyle = `rgba(255,255,255,${s.a})`;
-      ctx.arc(s.x, s.y, s.s, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${s.a*0.6})`;
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
       ctx.fill();
     }
 
-    // center coordinates and core radius recomputed
-    const centerX = window.innerWidth/2;
-    const centerY = window.innerHeight/2;
-    const coreR = Math.min(window.innerWidth, window.innerHeight) * 0.11;
+    // draw waves under everything (big translucent rings)
+    for(let i=waves.length-1;i>=0;i--){
+      const wv = waves[i];
+      wv.r += 8; // expansion speed
+      wv.alpha *= 0.992;
+      if(wv.r > wv.maxR || wv.alpha < 0.01) { waves.splice(i,1); continue; }
 
-    // orbit paths (faint)
-    ctx.save();
-    ctx.translate(centerX, centerY);
-    ctx.globalAlpha = 0.06;
-    for(let i=0;i<planets.length;i++){
-      const pr = planets[i].orbitR;
+      const g = ctx.createRadialGradient(cx(), cy(), wv.r*0.02, cx(), cy(), wv.r);
+      g.addColorStop(0, `rgba(6,255,140,${0.08 * wv.alpha})`);
+      g.addColorStop(0.4, `rgba(6,255,140,${0.035 * wv.alpha})`);
+      g.addColorStop(1, `rgba(6,255,140,0)`);
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(120,220,160,0.06)`;
-      ctx.lineWidth = 1;
-      ctx.ellipse(0,0, pr, pr*0.45, 0, 0, Math.PI*2);
+      ctx.fillStyle = g;
+      ctx.arc(cx(), cy(), wv.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // black hole core shimmer (3D-like)
+    const coreR = Math.min(W(),H()) * 0.18;
+    // rotating subtle rings for depth
+    ctx.save();
+    ctx.translate(cx(),cy());
+    const t = performance.now() * 0.00012;
+    for(let i=0;i<4;i++){
+      ctx.rotate(0.002 + i*0.0007 + t*0.04);
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(6,255,140,${0.06 - i*0.012})`;
+      ctx.lineWidth = 1.2 + (1.1 - i*0.25);
+      ctx.ellipse(0, 0, coreR*(1+0.12*i), coreR*(0.52+0.08*i), 0, 0, Math.PI*2);
       ctx.stroke();
     }
     ctx.restore();
-    ctx.globalAlpha = 1;
 
-    // update & draw planets and their moons
-    for(const p of planets){
-      p.angle += p.speed;
-      // convert elliptical orbit
-      const orbitX = centerX + Math.cos(p.angle) * p.orbitR;
-      const orbitY = centerY + Math.sin(p.angle) * (p.orbitR * 0.45);
+    // particles spiral into core
+    for(let p of particles){
+      p.angle += p.speed * (1 + p.layer*0.6);
+      p.radius *= (0.999 + p.layer*0.0007);
+      if(p.radius < coreR*0.14) p.radius = coreR + Math.random()*(Math.min(W(),H())*0.6);
 
-      // planet body
-      const col = p.col;
-      // planet gradient
-      const pg = ctx.createRadialGradient(orbitX - p.size*0.4, orbitY - p.size*0.4, p.size*0.08, orbitX, orbitY, p.size*1.6);
-      pg.addColorStop(0, `rgba(255,255,255,0.9)`);
-      pg.addColorStop(0.25, `hsla(${col.h}, ${col.s}%, ${col.l}%, 0.98)`);
-      pg.addColorStop(1, `hsla(${col.h-20}, ${col.s-10}%, ${col.l-20}%, 0.95)`);
+      const x = cx() + Math.cos(p.angle) * p.radius;
+      const y = cy() + Math.sin(p.angle) * p.radius;
+
+      // glow trail (short)
       ctx.beginPath();
-      ctx.fillStyle = pg;
-      ctx.arc(orbitX, orbitY, p.size, 0, Math.PI*2);
-      ctx.fill();
-
-      // subtle rim light
+      const hx = cx() + Math.cos(p.angle - p.speed*8) * (p.radius + 8);
+      const hy = cy() + Math.sin(p.angle - p.speed*8) * (p.radius + 8);
+      const grad = ctx.createLinearGradient(x,y,hx,hy);
+      grad.addColorStop(0, `rgba(6,255,140,${0.02 + (1-p.layer)*0.28})`);
+      grad.addColorStop(1, 'rgba(6,255,140,0)');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = Math.max(0.3, p.size*0.8);
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-      ctx.lineWidth = Math.max(1, p.size*0.09);
-      ctx.arc(orbitX, orbitY, p.size+ (p.size*0.06), 0, Math.PI*2);
+      ctx.moveTo(x,y);
+      ctx.lineTo(hx,hy);
       ctx.stroke();
 
-      // if planet has moons
-      if(p.moons && p.moons.length){
-        for(const m of p.moons){
-          m.angle += m.speed;
-          const mx = orbitX + Math.cos(m.angle) * m.orbitR;
-          const my = orbitY + Math.sin(m.angle) * (m.orbitR*0.6);
-          ctx.beginPath();
-          ctx.fillStyle = 'rgba(220,220,220,0.96)';
-          ctx.arc(mx, my, m.size, 0, Math.PI*2);
-          ctx.fill();
-        }
+      // tiny particle dot
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(6,255,140,${0.5 + (1-p.layer)*0.5})`;
+      ctx.arc(x,y, p.size, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // draw black-hole core (strong glow)
+    const coreGrad = ctx.createRadialGradient(cx(),cy(), coreR*0.02, cx(),cy(), coreR);
+    coreGrad.addColorStop(0, 'rgba(2,12,6,0.98)');
+    coreGrad.addColorStop(0.18, 'rgba(6,255,140,0.95)');
+    coreGrad.addColorStop(0.45, 'rgba(10,60,30,0.7)');
+    coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath();
+    ctx.fillStyle = coreGrad;
+    ctx.arc(cx(), cy(), coreR, 0, Math.PI*2);
+    ctx.fill();
+
+    // core black center
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(0,0,0,1)';
+    ctx.arc(cx(), cy(), coreR*0.28, 0, Math.PI*2);
+    ctx.fill();
+
+    // meteors draw & update
+    for(let i=meteors.length-1;i>=0;i--){
+      const m = meteors[i];
+      // update
+      m.x += m.vx;
+      m.y += m.vy;
+      m.life++;
+      // draw streak
+      const ex = m.x - m.vx * (m.len*0.06);
+      const ey = m.y - m.vy * (m.len*0.06);
+
+      const g = ctx.createLinearGradient(m.x,m.y, ex, ey);
+      g.addColorStop(0, `rgba(255,255,255,0.98)`);
+      g.addColorStop(0.2, `hsla(${m.hue},90%,60%,0.9)`);
+      g.addColorStop(1, `rgba(2,8,6,0)`);
+      ctx.strokeStyle = g;
+      ctx.lineWidth = Math.max(1.4, Math.min(6, m.len/40));
+      ctx.beginPath();
+      ctx.moveTo(m.x,m.y);
+      ctx.lineTo(ex,ey);
+      ctx.stroke();
+
+      // head glow
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255,255,255,0.95)`;
+      ctx.arc(m.x, m.y, Math.max(1.6, Math.min(6, m.len/60)), 0, Math.PI*2);
+      ctx.fill();
+
+      // remove if offscreen or life exceeded
+      if(m.x < -200 || m.x > W()+200 || m.y < -200 || m.y > H()+200 || m.life > m.ttl) {
+        meteors.splice(i,1);
       }
     }
 
-    // draw central saturn last (on top)
-    drawSaturn(centerX, centerY, coreR);
-
     requestAnimationFrame(draw);
   }
+
+  // spawn meteors occasionally with some randomness
+  setInterval(()=> {
+    // spawn between 0 and 3 meteors depending on screen size & randomness
+    const chance = Math.random();
+    const maxSpawn = (W()*H() > 1200000) ? 3 : 2;
+    const n = (chance>0.6?1:0) + (chance>0.94?1:0);
+    for(let i=0;i<n;i++) spawnMeteor();
+  }, 900);
+
+  function spawnMeteor(){
+    // spawn from a random edge with strong velocity toward general center area or diagonal
+    const side = Math.floor(Math.random()*4);
+    let x,y,vx,vy;
+    const baseSpeed = 8 + Math.random()*12;
+    const len = 120 + Math.random()*240;
+    if(side===0){ x = Math.random()*W(); y = -60; vx = (Math.random()-0.5)*6; vy = baseSpeed; }
+    else if(side===1){ x = W()+60; y = Math.random()*H(); vx = -baseSpeed - Math.random()*4; vy = (Math.random()-0.5)*6; }
+    else if(side===2){ x = Math.random()*W(); y = H()+60; vx = (Math.random()-0.5)*6; vy = -baseSpeed - Math.random()*4; }
+    else { x = -60; y = Math.random()*H(); vx = baseSpeed + Math.random()*4; vy = (Math.random()-0.5)*6; }
+    const ttl = 120 + Math.floor(Math.random()*240);
+    const hue = Math.floor(30 + Math.random()*120);
+    meteors.push({x,y,vx,vy,len,life:0,ttl,hue});
+  }
+
+  // start draw
   draw();
+
 })();
 
-/* End script */
+/* ----------------------------
+   Waves already spawn every 60s via spawnWave inside canvas closure.
+   Additionally, apply small screen-wide "glitch" effect occasionally for cinematic feel.
+   (handled by adding 'shock-anim' class on <html> during spawnWave).
+   ---------------------------- */
+
 </script>
 </body>
 </html>
