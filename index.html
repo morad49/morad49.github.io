@@ -4,32 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=1200">
 <title>DirtMc Server</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
- --bg:#0d0d0d;
- --text:#ffffff;
- --accent:#3a5aff;
+ --accent:#6a5cff;
+ --dark:#0e0e12;
+ --glass:rgba(20,20,30,0.75);
 }
 
 body{
  margin:0;
- font-family:'Segoe UI',sans-serif;
- background:var(--bg);
- color:var(--text);
- overflow-x:auto;
-
- background-image:
- linear-gradient(rgba(0,0,0,0.75),rgba(0,0,0,0.75)),
+ font-family:'Cairo',sans-serif;
+ background:
+ linear-gradient(rgba(0,0,0,0.75),rgba(0,0,0,0.85)),
  url('back.png');
  background-size:cover;
  background-position:center;
  background-attachment:fixed;
+ color:#fff;
+ overflow-x:auto;
 }
 
-/* Wrapper ثابت مثل PC */
+/* عرض ثابت زي PC */
 .wrapper{
  width:1200px;
  margin:auto;
@@ -40,105 +39,115 @@ nav{
  display:flex;
  justify-content:space-between;
  align-items:center;
- padding:25px 0;
- border-bottom:3px solid var(--accent);
+ padding:30px 0;
 }
 
 .logo{
- font-size:34px;
- font-weight:bold;
+ font-size:32px;
+ font-weight:700;
  color:var(--accent);
- font-family:'Courier New',monospace;
- letter-spacing:2px;
 }
 
-.links a{
- margin:0 15px;
+.menu a{
  color:white;
  text-decoration:none;
- font-weight:bold;
+ margin-left:30px;
+ font-weight:600;
  transition:0.3s;
 }
 
-.links a:hover{
+.menu a:hover{
  color:var(--accent);
 }
 
 /* HERO */
 .hero{
  display:flex;
- justify-content:space-between;
  align-items:center;
- height:85vh;
+ justify-content:space-between;
+ height:90vh;
 }
 
-.hero-text{
- max-width:600px;
+/* النص كله يمين */
+.content{
+ width:600px;
+ background:var(--glass);
+ padding:50px;
+ border-radius:20px;
+ backdrop-filter:blur(15px);
+ box-shadow:0 0 40px rgba(0,0,0,0.6);
+ text-align:right;
 }
 
-.tag{
+.badge{
  background:var(--accent);
- padding:6px 14px;
- font-weight:bold;
- border-radius:6px;
  display:inline-block;
+ padding:6px 15px;
+ border-radius:50px;
+ font-size:14px;
+ margin-bottom:20px;
 }
 
-.hero-text h1{
- font-size:72px;
- margin:20px 0;
- font-family:'Courier New',monospace;
+.content h1{
+ font-size:65px;
+ margin:15px 0;
 }
 
-.hero-text p{
- font-size:22px;
- opacity:0.8;
+.content p{
+ font-size:20px;
+ opacity:0.85;
+ margin-bottom:30px;
 }
 
-/* BUTTONS */
+.buttons{
+ display:flex;
+ gap:15px;
+ justify-content:flex-start;
+}
+
 .btn{
- margin-top:20px;
- padding:15px 30px;
- background:var(--accent);
+ padding:14px 30px;
  border:none;
+ border-radius:10px;
  font-weight:bold;
  cursor:pointer;
- color:white;
- border-radius:8px;
- box-shadow:0 0 25px var(--accent);
  transition:0.3s;
- font-size:16px;
 }
 
-.btn:hover{
- transform:translateY(-4px);
- box-shadow:0 0 40px var(--accent);
+.primary{
+ background:var(--accent);
+ color:white;
+ box-shadow:0 0 20px var(--accent);
 }
 
-/* UPTIME BOX */
-.status{
- margin-top:20px;
- background:rgba(0,0,0,0.6);
- padding:10px 15px;
- border-radius:6px;
- display:inline-block;
- font-weight:bold;
+.primary:hover{
+ transform:translateY(-5px);
 }
 
-/* CHARACTER */
-.hero img{
- width:420px;
- filter:drop-shadow(0 0 30px var(--accent));
- animation:float 3s ease-in-out infinite;
+.secondary{
+ background:transparent;
+ border:2px solid var(--accent);
+ color:white;
+}
+
+.secondary:hover{
+ background:var(--accent);
+}
+
+/* الصورة يسار */
+.character{
+ width:450px;
+ filter:drop-shadow(0 0 40px var(--accent));
+ animation:float 4s ease-in-out infinite;
 }
 
 @keyframes float{
  0%,100%{transform:translateY(0);}
- 50%{transform:translateY(-15px);}
+ 50%{transform:translateY(-20px);}
 }
 
 /* زوم للجوال */
-@media (max-width:768px){
+@media(max-width:768px){
  body{
   zoom:0.55;
  }
@@ -146,37 +155,41 @@ nav{
 
 </style>
 </head>
-
 <body>
 
 <div class="wrapper">
 
 <nav>
  <div class="logo">DirtMc</div>
- <div class="links">
-  <a href="#">Home</a>
-  <a href="#">Perks</a>
-  <a href="#">Servers</a>
-  <a href="https://discord.gg/dirtmc">Discord</a>
+ <div class="menu">
+  <a href="#">الرئيسية</a>
+  <a href="#">المميزات</a>
+  <a href="#">السيرفرات</a>
+  <a href="https://discord.gg/dirtmc">ديسكورد</a>
  </div>
 </nav>
 
 <section class="hero">
 
- <div class="hero-text">
-  <div class="tag">HERE AND NOW</div>
+ <div class="content">
+
+  <div class="badge">WELCOME TO THE FUTURE</div>
+
   <h1>DirtMc Server</h1>
-  <p>أفضل سيرفر QuickBox | play.dirtmc.net</p>
 
-  <button class="btn" onclick="copyIP()">COPY IP</button>
+  <p>
+  أفضل سيرفر QuickBox في المنطقة.  
+  حماية قوية، أداء مستقر، وتجربة لعب احترافية بدون لاق.
+  </p>
 
-  <div class="status">
-   UPTIME: <span id="uptime">99%</span>
+  <div class="buttons">
+   <button class="btn primary" onclick="copyIP()">نسخ IP</button>
+   <button class="btn secondary">انضم للديسكورد</button>
   </div>
 
  </div>
 
- <img src="netherite.png" alt="Character">
+ <img src="netherite.png" class="character">
 
 </section>
 
@@ -185,16 +198,9 @@ nav{
 <script>
 
 function copyIP(){
- const ip = "play.dirtmc.net";
- navigator.clipboard.writeText(ip);
+ navigator.clipboard.writeText("play.dirtmc.net");
  alert("تم نسخ IP السيرفر!");
 }
-
-/* عداد UPTIME شكلي */
-setInterval(()=>{
- let random = (98 + Math.random()*2).toFixed(2);
- document.getElementById("uptime").innerText = random + "%";
-},5000);
 
 </script>
 
