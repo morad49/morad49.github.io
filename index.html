@@ -1,188 +1,229 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DirtMc Account</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DirtMc | Secure System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0b10;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text: #ffffff;
+            --accent: #1c3dff;
+            --border: rgba(255, 255, 255, 0.1);
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+        body.light-mode {
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text: #121417;
+            --accent: #2b3b8c;
+            --border: rgba(0, 0, 0, 0.1);
+        }
 
-<style>
-:root{
- --bg:#000;
- --text:#fff;
- --card:rgba(255,255,255,0.05);
-}
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: all 0.5s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-.light{
- --bg:#f2f2f2;
- --text:#000;
- --card:rgba(0,0,0,0.05);
-}
+        /* زر التبديل */
+        .theme-toggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+        .theme-toggle:hover { transform: rotate(15deg) scale(1.1); }
 
-body{
- margin:0;
- font-family:Poppins;
- background:var(--bg);
- color:var(--text);
- display:flex;
- align-items:center;
- justify-content:center;
- height:100vh;
- transition:.5s;
- overflow:hidden;
-}
+        /* حاوية النماذج */
+        .auth-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
 
-/* Toggle */
-.toggle{
- position:absolute;
- top:20px;
- right:20px;
- font-size:26px;
- cursor:pointer;
-}
+        h2 { font-size: 28px; margin-bottom: 20px; letter-spacing: 1px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            box-sizing: border-box;
+        }
 
-/* Card */
-.card{
- background:var(--card);
- backdrop-filter:blur(15px);
- padding:40px;
- border-radius:20px;
- width:350px;
- text-align:center;
- box-shadow:0 0 50px rgba(120,100,255,.2);
-}
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
-input{
- width:100%;
- padding:12px;
- margin:10px 0;
- border:none;
- border-radius:10px;
- outline:none;
-}
+        .switch-link {
+            margin-top: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--accent);
+            display: block;
+        }
 
-button{
- width:100%;
- padding:12px;
- border:none;
- border-radius:10px;
- font-weight:bold;
- cursor:pointer;
- background:linear-gradient(90deg,#7a6bff,#a29bff);
- color:#fff;
- transition:.3s;
-}
+        /* شاشة DIRT النهائية */
+        #dirtScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #dirtScreen h1 {
+            font-size: 120px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            text-shadow: 0 0 20px var(--accent);
+        }
+        #dirtScreen a {
+            color: #5865F2;
+            text-decoration: none;
+            font-size: 24px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
 
-button:hover{
- transform:scale(1.05);
-}
-
-/* Main Screen */
-.mainScreen{
- display:none;
- flex-direction:column;
- align-items:center;
- justify-content:center;
- height:100vh;
- text-align:center;
-}
-
-.mainScreen h1{
- font-size:60px;
- text-shadow:0 0 40px #7a6bff;
-}
-
-.discord{
- margin-top:20px;
- padding:12px 25px;
- border-radius:40px;
- background:#5865F2;
- color:white;
- text-decoration:none;
- font-weight:bold;
-}
-
-/* Hide */
-.hidden{display:none;}
-
-</style>
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
 
-<div class="toggle" onclick="toggleTheme()">☀️</div>
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i id="themeIcon" class="fas fa-moon"></i>
+    </div>
 
-<!-- AUTH -->
-<div class="card" id="authBox">
-<h2>Register / Login</h2>
+    <div id="registerBox" class="auth-container">
+        <h2>إنشاء حساب جديد</h2>
+        <input type="text" id="regUser" placeholder="اسم المستخدم">
+        <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
+        <button class="btn" onclick="sendCode('register')">إرسال كود التأكيد</button>
+        <div id="regVerify" class="hidden">
+            <input type="text" id="regCode" placeholder="أدخل الكود المرسل لبريدك">
+            <button class="btn" onclick="finishRegister()">تأكيد الحساب</button>
+        </div>
+        <span class="switch-link" onclick="showBox('loginBox')">لديك حساب؟ سجل دخولك</span>
+    </div>
 
-<input type="text" id="email" placeholder="Enter Email">
-<input type="password" id="pass" placeholder="Enter Password">
+    <div id="loginBox" class="auth-container hidden">
+        <h2>تسجيل الدخول</h2>
+        <input type="text" id="loginUser" placeholder="اسم المستخدم">
+        <button class="btn" onclick="sendCode('login')">إرسال كود 2FA</button>
+        <div id="login2FA" class="hidden">
+            <input type="text" id="loginCode" placeholder="أدخل كود 2FA">
+            <button class="btn" onclick="finishLogin()">دخول</button>
+        </div>
+        <span class="switch-link" onclick="showBox('registerBox')">ليس لديك حساب؟ سجل الآن</span>
+    </div>
 
-<button onclick="register()">Register</button>
-<button onclick="login()">Login</button>
+    <div id="dirtScreen">
+        <h1 id="dirtText">DIRT</h1>
+        <a href="https://Discord.gg/dirtmc" target="_blank">Discord.gg/dirtmc</a>
+        <button class="btn" style="width: auto; margin-top: 50px; background: #333;" onclick="logout()">تسجيل الخروج</button>
+    </div>
 
-<p id="msg"></p>
-</div>
+    <script>
+        let generatedCode = null;
 
-<!-- MAIN -->
-<div class="mainScreen" id="mainScreen">
-<h1>DirtMc</h1>
-<a class="discord" href="https://discord.gg/dirtmc" target="_blank">Join Discord</a>
-</div>
+        // التحقق من الأرشيف (هل المستخدم مسجل دخول سابقاً؟)
+        window.onload = () => {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                showDirtScreen();
+            }
+        };
 
-<script>
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            body.classList.toggle('light-mode');
+            icon.className = body.classList.contains('light-mode') ? 'fas fa-sun' : 'fas fa-moon';
+        }
 
-/* ===== REGISTER ===== */
-function register(){
- let email = document.getElementById("email").value;
- let pass = document.getElementById("pass").value;
+        function showBox(id) {
+            document.querySelectorAll('.auth-container').forEach(box => box.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
 
- if(!email || !pass){
-  showMsg("Fill fields");
-  return;
- }
+        function sendCode(type) {
+            generatedCode = Math.floor(1000 + Math.random() * 9000); // توليد كود وهمي
+            alert("محاكاة: تم إرسال الكود " + generatedCode + " إلى بريدك الإلكتروني.");
+            
+            if (type === 'register') {
+                document.getElementById('regVerify').classList.remove('hidden');
+            } else {
+                document.getElementById('login2FA').classList.remove('hidden');
+            }
+        }
 
- localStorage.setItem("archive_email", email);
- localStorage.setItem("archive_pass", pass);
+        function finishRegister() {
+            const code = document.getElementById('regCode').value;
+            if (code == generatedCode) {
+                const user = document.getElementById('regUser').value;
+                localStorage.setItem('username', user); // نظام الأرشيف
+                alert("تم التسجيل بنجاح! يمكنك الآن تسجيل الدخول.");
+                showBox('loginBox');
+            } else {
+                alert("الكود خاطئ!");
+            }
+        }
 
- showMsg("Registered Successfully");
-}
+        function finishLogin() {
+            const code = document.getElementById('loginCode').value;
+            const user = document.getElementById('loginUser').value;
+            const savedUser = localStorage.getItem('username');
 
-/* ===== LOGIN ===== */
-function login(){
- let email = document.getElementById("email").value;
- let pass = document.getElementById("pass").value;
+            if (user === savedUser && code == generatedCode) {
+                localStorage.setItem('isLoggedIn', 'true');
+                showDirtScreen();
+            } else {
+                alert("بيانات الدخول أو الكود غير صحيح!");
+            }
+        }
 
- let savedEmail = localStorage.getItem("archive_email");
- let savedPass = localStorage.getItem("archive_pass");
+        function showDirtScreen() {
+            document.getElementById('dirtScreen').style.display = 'flex';
+        }
 
- if(email === savedEmail && pass === savedPass){
-   document.getElementById("authBox").classList.add("hidden");
-   document.getElementById("mainScreen").style.display="flex";
- }else{
-   showMsg("Wrong account");
- }
-}
-
-/* ===== Theme Toggle ===== */
-function toggleTheme(){
- document.body.classList.toggle("light");
- let icon = document.querySelector(".toggle");
-
- if(document.body.classList.contains("light")){
-   icon.innerText="🌙";
- }else{
-   icon.innerText="☀️";
- }
-}
-
-/* Helper */
-function showMsg(m){
- document.getElementById("msg").innerText = m;
-}
-
-</script>
-
+        function logout() {
+            localStorage.setItem('isLoggedIn', 'false');
+            location.reload();
+        }
+    </script>
 </body>
 </html>
