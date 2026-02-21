@@ -1,113 +1,466 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!doctype html>
+<html lang="en" dir="ltr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DirtMc Server</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DirtMc — Play Now</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+  :root{
+    --bg-dark: #06060a;
+    --card: rgba(12,12,18,0.62);
+    --accent: #7b6bff;
+    --accent-2:#4ee6c2;
+    --white: #f6f7fb;
+    --muted: #d3d6df;
+  }
 
-body{
-  font-family:'Cairo',sans-serif;
-  min-height:100vh;
-  background: url('back.png') no-repeat center center;
-  background-size: cover;
-  background-color:#000;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  padding:5%;
-  direction:rtl;
-  color:#fff;
-}
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:"Poppins",system-ui,Segoe UI,Roboto,Arial;
+    background: url('back.png') no-repeat center center;
+    background-size: cover;
+    background-color: var(--bg-dark);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+  }
 
-/* طبقة تعتيم */
-body::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.65);
-  z-index:0;
-}
+  /* dark overlay so text is readable */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.75) 100%);
+    z-index:0;
+    pointer-events:none;
+  }
 
-/* المحتوى */
-.content{
-  position:relative;
-  z-index:1;
-  max-width:500px;
-  text-align:right;
-}
-
-/* العنوان */
-.content h1{
-  font-size:55px;
-  margin-bottom:15px;
-  color:#00ffff;
-  text-shadow:0 0 15px #00ffff;
-}
-
-/* النص */
-.content p{
-  font-size:20px;
-  margin-bottom:25px;
-  line-height:1.7;
-  color:#ddd;
-}
-
-/* زر */
-.btn{
-  display:inline-block;
-  padding:14px 35px;
-  background:#00ffff;
-  color:#000;
-  text-decoration:none;
-  font-weight:bold;
-  border-radius:8px;
-  transition:0.3s;
-}
-
-.btn:hover{
-  background:#00cccc;
-  transform:scale(1.05);
-}
-
-/* للجوال */
-@media (max-width:768px){
-
-  body{
+  /* center container */
+  .stage{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
     justify-content:center;
-    text-align:center;
+    padding:4vw;
+    z-index:1;
+    position:relative;
   }
 
-  .content{
-    max-width:100%;
+  .card{
+    width:min(980px,96%);
+    background: var(--card);
+    border-radius:20px;
+    padding:36px;
+    display:flex;
+    gap:28px;
+    align-items:center;
+    justify-content:space-between;
+    box-shadow: 0 10px 40px rgba(10,8,20,0.6), 0 0 60px rgba(123,107,255,0.06) inset;
+    position:relative;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,0.03);
+    backdrop-filter: blur(8px) saturate(120%);
   }
 
-  .content h1{
-    font-size:40px;
+  /* right side = description (text should be on the right) */
+  .desc{
+    flex:1;
+    text-align:right;
+    direction:rtl;
+    color:var(--white);
   }
 
-  .content p{
-    font-size:18px;
+  .logo{
+    font-weight:700;
+    color:var(--accent);
+    letter-spacing:1px;
+    font-size:20px;
+    margin-bottom:6px;
+    text-shadow:0 4px 18px rgba(123,107,255,0.12);
   }
-}
+
+  h1{
+    margin:0 0 10px 0;
+    font-size:44px;
+    line-height:1;
+    color:var(--white);
+    text-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+
+  p.lead{
+    margin:10px 0 24px 0;
+    color:var(--muted);
+    font-size:17px;
+    max-width:520px;
+    line-height:1.6;
+  }
+
+  .meta{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:flex-end;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+
+  .chip{
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    padding:10px 14px;
+    border-radius:12px;
+    font-weight:600;
+    color:var(--white);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    border:1px solid rgba(255,255,255,0.02);
+    display:flex;
+    gap:8px;
+    align-items:center;
+    font-size:14px;
+  }
+
+  .chip .label{ opacity:0.85; font-weight:500; color:var(--muted); font-size:13px; }
+
+  .actions{
+    display:flex;
+    gap:14px;
+    justify-content:flex-end;
+    align-items:center;
+  }
+
+  .btn{
+    -webkit-tap-highlight-color: transparent;
+    border:0;
+    cursor:pointer;
+    padding:12px 18px;
+    border-radius:12px;
+    font-weight:700;
+    font-size:15px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+    transition: transform .18s ease, box-shadow .18s ease;
+    display:inline-flex;
+    gap:10px;
+    align-items:center;
+  }
+
+  .btn:active{ transform: translateY(2px) scale(.998); }
+
+  .btn.primary{
+    background: linear-gradient(90deg, var(--accent), #9aa0ff);
+    color: #fff;
+    padding:12px 22px;
+    box-shadow: 0 12px 40px rgba(123,107,255,0.18);
+    border:1px solid rgba(255,255,255,0.04);
+  }
+
+  .btn.ghost{
+    background: transparent;
+    color:var(--white);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding:10px 14px;
+  }
+
+  .btn.small{
+    padding:8px 12px;
+    border-radius:10px;
+    font-size:13px;
+  }
+
+  /* left side - decorative shapes & subtle glow (no images used) */
+  .visual{
+    width:380px;
+    min-width:260px;
+    height:260px;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+  }
+
+  /* soft glowing orb */
+  .orb{
+    position:absolute;
+    width:300px;
+    height:300px;
+    border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(78,230,194,0.14), transparent 20%),
+                radial-gradient(circle at 70% 70%, rgba(123,107,255,0.12), transparent 25%);
+    filter: blur(24px);
+    transform: scale(.9);
+  }
+
+  /* polygon shapes */
+  .poly{
+    position:absolute;
+    width:120px;
+    height:120px;
+    border-radius:16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08));
+    border: 1px solid rgba(255,255,255,0.03);
+    transform: rotate(15deg);
+    box-shadow: 0 16px 50px rgba(0,0,0,0.6);
+  }
+
+  .poly.one{ right:18px; top:8px; transform: rotate(-6deg) scale(1.05); width:140px; height:140px; border-radius:18px; }
+  .poly.two{ left:14px; bottom:10px; transform: rotate(22deg) scale(.9); width:110px; height:110px; border-radius:14px; }
+
+  /* subtle animated lines */
+  .lines{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    mix-blend-mode:screen;
+  }
+
+  .line{
+    position:absolute;
+    width:2px;
+    height:120%;
+    background: linear-gradient(180deg, rgba(123,107,255,0.12), transparent 60%);
+    left:40%;
+    transform: translateX(-50%) rotate(10deg);
+    opacity:0.7;
+    filter:blur(10px);
+    animation: drift 6s linear infinite;
+  }
+  @keyframes drift{ 0%{ transform:translateY(-8%) rotate(8deg) } 50%{ transform:translateY(8%) rotate(-6deg) } 100%{ transform:translateY(-8%) rotate(8deg) } }
+
+  /* particle container (for click effects) */
+  .particles{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:8;
+  }
+
+  /* small footer note */
+  .foot{
+    margin-top:14px;
+    color: #bfc4d0;
+    font-size:13px;
+    opacity:0.9;
+    text-align:right;
+  }
+
+  /* responsive tweaks */
+  @media (max-width:880px){
+    .card{ flex-direction:column-reverse; gap:18px; padding:20px; align-items:center; text-align:center; }
+    .desc{ text-align:center; direction:ltr; }
+    .meta{ justify-content:center; }
+    .actions{ justify-content:center; }
+    .visual{ width:86%; height:200px; min-width:auto; }
+  }
+
 </style>
 </head>
-
 <body>
+  <div class="stage">
+    <div class="card" role="region" aria-label="DirtMc server card">
 
-<div class="content">
-  <h1>DirtMc Server</h1>
-  <p>أفضل سيرفر ماينكرافت بستايل مظلم واحترافي.  
-  انضم الآن واستمتع بتجربة لعب خرافية.</p>
+      <div class="desc" id="desc">
+        <div class="logo">DirtMc</div>
+        <h1>Play DirtMc Now</h1>
 
-  <a href="#" class="btn">انضم الآن</a>
-</div>
+        <p class="lead">
+          Join the friendly DirtMc community — stable performance, custom features, and nonstop adventure.
+          Fast setup. Active staff. Unique game modes.
+        </p>
 
+        <div class="meta" aria-hidden="false">
+          <div class="chip"><span class="label">IP</span>&nbsp;<strong id="ipLabel">DirtMc.pro:21411</strong></div>
+          <div class="chip"><span class="label">Discord</span>&nbsp;<strong>discord.gg/dirtmc</strong></div>
+          <div class="chip"><span class="label">Mode</span>&nbsp;<strong>Survival / Mini-Games</strong></div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="copyBtn" title="Copy server IP">Copy IP</button>
+          <a class="btn ghost small" href="https://discord.gg/dirtmc" target="_blank" id="joinBtn">Join Discord</a>
+        </div>
+
+        <div class="foot">Server: DirtMc.pro:21411 • Port: 21411 • Discord: discord.gg/dirtmc</div>
+      </div>
+
+      <div class="visual" aria-hidden="true">
+        <div class="orb"></div>
+        <div class="poly one"></div>
+        <div class="poly two"></div>
+        <div class="lines"><div class="line"></div></div>
+
+        <!-- particle layer -->
+        <div class="particles" id="particles"></div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+/* -------------------------
+   PARTICLES + RING EFFECT
+   ------------------------- */
+const particlesRoot = document.getElementById('particles');
+const copyBtn = document.getElementById('copyBtn');
+const joinBtn = document.getElementById('joinBtn');
+
+function makeBurst(x, y) {
+  const count = 18;
+  for (let i=0;i<count;i++){
+    const el = document.createElement('span');
+    el.className = 'p';
+    const size = 8 + Math.random()*16;
+    el.style.position='absolute';
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.borderRadius = (Math.random()>0.6? '20%':'50%');
+    const hue = 160 + Math.round(Math.random()*90);
+    const sat = 60 + Math.round(Math.random()*20);
+    el.style.background = `linear-gradient(45deg, hsla(${hue},${sat}%,80%,0.95), hsla(${hue+30},${sat}%,65%,0.95))`;
+    el.style.boxShadow = `0 6px 18px rgba(0,0,0,0.35), 0 0 16px rgba(255,255,255,0.04) inset`;
+    el.style.transform = 'translate(-50%,-50%) scale(0.6)';
+    el.style.opacity = '1';
+    el.style.transition = 'transform 700ms cubic-bezier(.15,.9,.25,1), opacity 700ms ease';
+    particlesRoot.appendChild(el);
+
+    // animate
+    const angle = (Math.PI*2) * (i / count) + (Math.random()*0.4 - 0.2);
+    const dist = 60 + Math.random()*120;
+    requestAnimationFrame(()=> {
+      el.style.transform = `translate(${Math.cos(angle)*dist - 50}%, ${Math.sin(angle)*dist - 50}%) scale(0.9)`;
+      el.style.opacity = '0';
+    });
+
+    // remove
+    setTimeout(()=> el.remove(), 900 + Math.random()*260);
+  }
+
+  // pulse ring
+  const ring = document.createElement('div');
+  ring.style.position='absolute';
+  ring.style.left = x + 'px';
+  ring.style.top = y + 'px';
+  ring.style.width='24px';
+  ring.style.height='24px';
+  ring.style.borderRadius='50%';
+  ring.style.border = `2px solid rgba(255,255,255,0.18)`;
+  ring.style.transform='translate(-50%,-50%) scale(0.8)';
+  ring.style.opacity='0.9';
+  ring.style.boxShadow = `0 0 28px rgba(123,107,255,0.12)`;
+  ring.style.transition = 'transform 650ms cubic-bezier(.15,.9,.25,1), opacity 650ms ease';
+  particlesRoot.appendChild(ring);
+  requestAnimationFrame(()=> {
+    ring.style.transform='translate(-50%,-50%) scale(6)';
+    ring.style.opacity='0';
+  });
+  setTimeout(()=> ring.remove(), 700);
+}
+
+/* -------------------------
+   CLIPBOARD + CLICK SOUND
+   ------------------------- */
+function playCuteChime(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+
+    // short pluck
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(740, now);
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start(now);
+    o.stop(now + 0.46);
+
+    // small bell above
+    const o2 = ctx.createOscillator();
+    const g2 = ctx.createGain();
+    o2.type = 'triangle';
+    o2.frequency.setValueAtTime(1180, now + 0.02);
+    g2.gain.setValueAtTime(0.0001, now + 0.02);
+    g2.gain.exponentialRampToValueAtTime(0.08, now + 0.04);
+    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+    // subtle low-pass for sweetness
+    const bi = ctx.createBiquadFilter();
+    bi.type = 'lowpass';
+    bi.frequency.setValueAtTime(2400, now);
+    o2.connect(g2);
+    g2.connect(bi);
+    bi.connect(ctx.destination);
+    o2.start(now + 0.02);
+    o2.stop(now + 0.62);
+  }catch(e){
+    // ignore if not allowed
+    console.warn('audio error', e);
+  }
+}
+
+copyBtn.addEventListener('click', async (ev)=>{
+  const rect = copyBtn.getBoundingClientRect();
+  const x = rect.left + rect.width/2 - particlesRoot.getBoundingClientRect().left;
+  const y = rect.top + rect.height/2 - particlesRoot.getBoundingClientRect().top;
+
+  // spawn particles
+  makeBurst(x, y);
+
+  // play sound
+  playCuteChime();
+
+  // copy IP
+  const ip = 'DirtMc.pro:21411';
+  try{
+    await navigator.clipboard.writeText(ip);
+    // small visual feedback
+    copyBtn.innerText = 'Copied!';
+    setTimeout(()=> copyBtn.innerText = 'Copy IP', 1200);
+  }catch(err){
+    // fallback prompt
+    prompt('Copy server IP:', ip);
+  }
+});
+
+/* click on join - small effect + sound */
+joinBtn.addEventListener('click', (ev)=>{
+  // compute center of button
+  const rect = joinBtn.getBoundingClientRect();
+  const x = rect.left + rect.width/2 - particlesRoot.getBoundingClientRect().left;
+  const y = rect.top + rect.height/2 - particlesRoot.getBoundingClientRect().top;
+  makeBurst(x, y);
+  playCuteChime();
+  // allow link to open normally
+});
+
+/* support clicking anywhere on card to spawn little spark */
+document.querySelector('.card').addEventListener('click', (ev)=>{
+  // ignore clicks on the buttons (they already handle)
+  if (ev.target.closest('.btn')) return;
+  const rootRect = particlesRoot.getBoundingClientRect();
+  const x = ev.clientX - rootRect.left;
+  const y = ev.clientY - rootRect.top;
+  makeBurst(x, y);
+  // quieter chime
+  setTimeout(()=> playCuteChime(), 10);
+});
+
+/* make sure particle container covers left visual area */
+(function ensureParticlesLayer(){
+  // fix size on resize (particles layer absolute positioning inside visual)
+  const resize = ()=> {
+    const vis = document.querySelector('.visual');
+    const pr = particlesRoot.parentElement;
+    // nothing to do — particles positioned relative to .visual area by using its local coords
+  };
+  window.addEventListener('resize', resize);
+})();
+
+</script>
 </body>
 </html>
