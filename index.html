@@ -3,115 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DirtMc | Premium Green System</title>
+    <title>DirtMc | Responsive Cyber Archive</title>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <style>
         :root {
-            --bg: #05070a;
-            --card-bg: #0d1117;
-            --text: #ffffff;
-            --accent: #2ea043;
-            --glow: 0 0 20px rgba(46, 160, 67, 0.4);
-            --border: #21262d;
+            --bg-color: #030508;
+            --accent: #00ff66;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         body {
             margin: 0;
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
-            background-image: radial-gradient(circle at center, #111b13 0%, #05070a 100%);
+            background-image: radial-gradient(circle at center, #0a1f0e 0%, #030508 100%);
         }
 
         .auth-container {
-            background: var(--card-bg);
+            position: relative;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             padding: 40px 30px;
-            border-radius: 16px;
+            border-radius: 28px;
             border: 1px solid var(--border);
             width: 100%;
-            max-width: 380px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            transition: all 0.4s ease;
+            box-sizing: border-box;
+        }
+
+        /* ضبط العرض حسب نوع الشاشة */
+        @media (min-width: 768px) {
+            .auth-container {
+                max-width: 450px; /* للـ PC */
+                padding: 50px 40px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .auth-container {
+                max-width: 100%; /* للجوال */
+                border-radius: 20px;
+            }
+            h2 { font-size: 24px !important; }
+        }
+
+        .auth-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 50%; height: 3px;
+            background: var(--accent);
+            box-shadow: 0 0 25px var(--accent);
+            border-radius: 0 0 10px 10px;
         }
 
         h2 { 
-            color: var(--accent); 
-            font-size: 28px; 
-            margin-bottom: 30px; 
-            letter-spacing: 3px; 
-            text-shadow: 0 0 10px rgba(46, 160, 67, 0.2);
+            font-size: 30px; 
+            letter-spacing: 5px; 
+            margin-bottom: 35px;
+            background: linear-gradient(to bottom, #ffffff 0%, #2ea043 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        .input-group { position: relative; margin-bottom: 15px; }
 
         input {
             width: 100%;
-            padding: 15px;
-            background: #161b22;
+            padding: 18px;
+            margin: 12px 0;
+            background: rgba(0,0,0,0.4);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
-            box-sizing: border-box;
-            outline: none;
+            border-radius: 15px;
+            color: #fff;
             font-size: 16px;
-            transition: all 0.3s ease;
+            outline: none;
+            transition: 0.3s;
+            box-sizing: border-box;
         }
 
         input:focus {
             border-color: var(--accent);
-            box-shadow: var(--glow);
-            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+            transform: scale(1.01);
         }
 
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             background: var(--accent);
             border: none;
-            color: white;
+            color: #000;
             font-weight: 800;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 15px;
             font-size: 16px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            letter-spacing: 2px;
+            transition: 0.3s;
         }
 
         .btn:hover {
-            filter: brightness(1.2);
-            box-shadow: 0 0 25px rgba(46, 160, 67, 0.6);
-            transform: scale(1.02);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 255, 102, 0.4);
         }
 
-        .btn:disabled { background: #21262d; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* رسالة الحالة السموث */
         .status-done {
             display: none;
-            background: rgba(46, 160, 67, 0.1);
-            color: #4cd964;
+            color: var(--accent);
+            background: rgba(0, 255, 102, 0.1);
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 15px;
             margin-bottom: 20px;
-            font-size: 14px;
             border: 1px solid var(--accent);
+            font-size: 14px;
             font-weight: bold;
-            animation: slideIn 0.5s ease;
+            animation: fadeIn 0.5s;
         }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         #dirtScreen {
             position: fixed;
@@ -121,20 +143,19 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 100;
         }
 
         #dirtText {
-            font-size: clamp(70px, 18vw, 130px);
+            font-size: clamp(60px, 20vw, 150px);
             font-weight: 900;
             color: #fff;
-            text-shadow: 0 0 40px var(--accent);
-            letter-spacing: 15px;
+            text-shadow: 0 0 50px var(--accent);
         }
 
-        .hidden { display: none !important; }
-        .switch-link { margin-top: 25px; display: block; color: #8b949e; cursor: pointer; font-size: 13px; text-decoration: none; transition: 0.3s; }
+        .switch-link { margin-top: 25px; display: block; color: #777; cursor: pointer; text-decoration: none; font-size: 14px; }
         .switch-link:hover { color: var(--accent); }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -145,11 +166,11 @@
         <input type="text" id="regUser" placeholder="USERNAME">
         <input type="email" id="regEmail" placeholder="EMAIL ADDRESS">
         <input type="password" id="regPass" placeholder="PASSWORD">
-        <button class="btn" id="regBtn" onclick="handleAuth('register')">GET CODE</button>
+        <button class="btn" id="regBtn" onclick="handleAuth('register')">Get Code</button>
         
         <div id="regVerify" class="hidden">
-            <input type="text" id="regCodeInput" placeholder="ENTER 4-DIGIT CODE" style="margin-top: 20px; border-color: var(--accent);">
-            <button class="btn" onclick="completeRegister()">ARCHIVE ACCOUNT</button>
+            <input type="text" id="regCodeInput" placeholder="ENTER 4-DIGIT CODE" style="margin-top:20px; border-color:var(--accent);">
+            <button class="btn" onclick="completeRegister()">SAVE TO ARCHIVE</button>
         </div>
         <span class="switch-link" onclick="showBox('loginBox')">ALREADY REGISTERED? LOGIN</span>
     </div>
@@ -159,33 +180,33 @@
         <h2>LOGIN</h2>
         <input type="text" id="loginUser" placeholder="USERNAME">
         <input type="password" id="loginPass" placeholder="PASSWORD">
-        <button class="btn" id="loginBtn" onclick="handleAuth('login')">REQUEST 2FA</button>
+        <button class="btn" id="loginBtn" onclick="handleAuth('login')">Request 2FA</button>
         
         <div id="login2FA" class="hidden">
-            <input type="text" id="loginCodeInput" placeholder="ENTER 2FA CODE" style="margin-top: 20px; border-color: var(--accent);">
+            <input type="text" id="loginCodeInput" placeholder="ENTER 2FA CODE" style="margin-top:20px; border-color:var(--accent);">
             <button class="btn" onclick="completeLogin()">AUTHORIZE</button>
         </div>
-        <span class="switch-link" onclick="showBox('registerBox')">NEW USER? CREATE ARCHIVE</span>
+        <span class="switch-link" onclick="showBox('registerBox')">NEW PLAYER? CREATE ACCOUNT</span>
     </div>
 
     <div id="dirtScreen">
         <h1 id="dirtText">DIRT</h1>
-        <a href="https://Discord.gg/dirtmc" target="_blank" style="color: var(--accent); text-decoration: none; margin-top: 30px; font-weight: bold; letter-spacing: 4px;">DISCORD.GG/DIRTMC</a>
-        <button class="btn" style="width: auto; padding: 12px 60px; margin-top: 50px; background: #1a1a1a; border: 1px solid #333;" onclick="location.reload()">LOGOUT</button>
+        <a href="https://Discord.gg/dirtmc" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: bold; letter-spacing: 5px;">DISCORD.GG/DIRTMC</a>
+        <button class="btn" style="width: auto; padding: 12px 60px; margin-top: 50px; background: #111;" onclick="location.reload()">LOGOUT</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 
-        // ضغ بيانات Firebase الخاصة بك هنا ليعمل الأرشيف العالمي
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyB7oGrcD1ShriCYTP_0_vMPdPkkmd2GfwU",
+            authDomain: "dirtmc-7c068.firebaseapp.com",
+            projectId: "dirtmc-7c068",
+            storageBucket: "dirtmc-7c068.firebasestorage.app",
+            messagingSenderId: "808909665625",
+            appId: "1:808909665625:web:0aa7aaad9c31dc0e0d4848",
+            measurementId: "G-449ZMPHQL6"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -194,37 +215,29 @@
     </script>
 
     <script>
-        // الربط المباشر مع حسابك
         (function() { emailjs.init("OqV7lpJJmCVgAnrx6"); })();
-
         let generatedCode = null;
 
         function showBox(id) {
-            document.getElementById('registerBox').classList.add('hidden');
-            document.getElementById('loginBox').classList.add('hidden');
+            document.querySelectorAll('.auth-container').forEach(c => c.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-        }
-
-        function showDone(id) {
-            const el = document.getElementById(id);
-            el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 5000);
         }
 
         async function handleAuth(type) {
             const user = (type === 'register') ? document.getElementById('regUser').value : document.getElementById('loginUser').value;
             const pass = (type === 'register') ? document.getElementById('regPass').value : document.getElementById('loginPass').value;
             const btn = (type === 'register') ? document.getElementById('regBtn') : document.getElementById('loginBtn');
+            const status = (type === 'register') ? document.getElementById('regStatus') : document.getElementById('loginStatus');
             let email = "";
 
-            if (!user || !pass) return alert("MISSING USERNAME OR PASSWORD!");
+            if (!user || !pass) return alert("يرجى إدخال البيانات كاملة");
 
             btn.disabled = true;
-            btn.innerText = "PROCESSING...";
+            btn.innerText = "Processing...";
 
             if (type === 'register') {
                 email = document.getElementById('regEmail').value;
-                if (!email) { btn.disabled = false; btn.innerText = "GET CODE"; return alert("ENTER EMAIL!"); }
+                if (!email) { btn.disabled = false; btn.innerText = "Get Code"; return alert("أدخل الإيميل!"); }
             } else {
                 try {
                     const userRef = window.fBase.doc(window.fBase.db, "users", user);
@@ -232,28 +245,27 @@
                     if (snap.exists() && snap.data().password === pass) {
                         email = snap.data().email;
                     } else {
-                        btn.disabled = false; btn.innerText = "REQUEST 2FA";
-                        return alert("INVALID CREDENTIALS!");
+                        alert("بيانات خاطئة!");
+                        btn.disabled = false; btn.innerText = "Request 2FA";
+                        return;
                     }
-                } catch(e) { alert("FIREBASE CONFIG MISSING!"); btn.disabled = false; return; }
+                } catch(e) { alert("خطأ في الاتصال بالقاعدة"); btn.disabled = false; return; }
             }
 
             generatedCode = Math.floor(1000 + Math.random() * 9000);
 
-            // استخدام الـ Template الخاص بك
             emailjs.send("service_nd6soio", "Template_f837clr", {
                 to_email: email,
-                verification_code: generatedCode,
-                user_name: user
+                verification_code: generatedCode
             }).then(() => {
-                showDone(type === 'register' ? 'regStatus' : 'loginStatus');
-                btn.innerText = "SENT ✅";
+                status.style.display = 'block';
+                setTimeout(() => { status.style.display = 'none'; }, 6000);
+                btn.innerText = "Sent ✅";
                 if (type === 'register') document.getElementById('regVerify').classList.remove('hidden');
                 else document.getElementById('login2FA').classList.remove('hidden');
-            }).catch(err => {
-                alert("ERROR: CHECK EMAILJS DASHBOARD");
+            }).catch(() => {
+                alert("خطأ في إرسال الكود!");
                 btn.disabled = false;
-                btn.innerText = "RETRY";
             });
         }
 
@@ -265,15 +277,15 @@
                 await window.fBase.setDoc(window.fBase.doc(window.fBase.db, "users", user), {
                     username: user, password: pass, email: email
                 });
-                alert("ARCHIVED SUCCESSFULLY!");
+                alert("تم الحفظ في الأرشيف!");
                 showBox('loginBox');
-            } else alert("INVALID CODE!");
+            } else alert("كود خطأ!");
         }
 
         function completeLogin() {
             if (document.getElementById('loginCodeInput').value == generatedCode) {
                 document.getElementById('dirtScreen').style.display = 'flex';
-            } else alert("INVALID 2FA!");
+            } else alert("كود خطأ!");
         }
     </script>
 </body>
