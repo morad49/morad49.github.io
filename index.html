@@ -1,208 +1,113 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1200">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DirtMc Server</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
-
-:root{
- --accent:#6a5cff;
- --dark:#0e0e12;
- --glass:rgba(20,20,30,0.75);
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
 body{
- margin:0;
- font-family:'Cairo',sans-serif;
- background:
- linear-gradient(rgba(0,0,0,0.75),rgba(0,0,0,0.85)),
- url('back.png');
- background-size:cover;
- background-position:center;
- background-attachment:fixed;
- color:#fff;
- overflow-x:auto;
+  font-family:'Cairo',sans-serif;
+  min-height:100vh;
+  background: url('back.png') no-repeat center center;
+  background-size: cover;
+  background-color:#000;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding:5%;
+  direction:rtl;
+  color:#fff;
 }
 
-/* عرض ثابت زي PC */
-.wrapper{
- width:1200px;
- margin:auto;
+/* طبقة تعتيم */
+body::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  z-index:0;
 }
 
-/* NAV */
-nav{
- display:flex;
- justify-content:space-between;
- align-items:center;
- padding:30px 0;
-}
-
-.logo{
- font-size:32px;
- font-weight:700;
- color:var(--accent);
-}
-
-.menu a{
- color:white;
- text-decoration:none;
- margin-left:30px;
- font-weight:600;
- transition:0.3s;
-}
-
-.menu a:hover{
- color:var(--accent);
-}
-
-/* HERO */
-.hero{
- display:flex;
- align-items:center;
- justify-content:space-between;
- height:90vh;
-}
-
-/* النص كله يمين */
+/* المحتوى */
 .content{
- width:600px;
- background:var(--glass);
- padding:50px;
- border-radius:20px;
- backdrop-filter:blur(15px);
- box-shadow:0 0 40px rgba(0,0,0,0.6);
- text-align:right;
+  position:relative;
+  z-index:1;
+  max-width:500px;
+  text-align:right;
 }
 
-.badge{
- background:var(--accent);
- display:inline-block;
- padding:6px 15px;
- border-radius:50px;
- font-size:14px;
- margin-bottom:20px;
-}
-
+/* العنوان */
 .content h1{
- font-size:65px;
- margin:15px 0;
+  font-size:55px;
+  margin-bottom:15px;
+  color:#00ffff;
+  text-shadow:0 0 15px #00ffff;
 }
 
+/* النص */
 .content p{
- font-size:20px;
- opacity:0.85;
- margin-bottom:30px;
+  font-size:20px;
+  margin-bottom:25px;
+  line-height:1.7;
+  color:#ddd;
 }
 
-.buttons{
- display:flex;
- gap:15px;
- justify-content:flex-start;
-}
-
+/* زر */
 .btn{
- padding:14px 30px;
- border:none;
- border-radius:10px;
- font-weight:bold;
- cursor:pointer;
- transition:0.3s;
+  display:inline-block;
+  padding:14px 35px;
+  background:#00ffff;
+  color:#000;
+  text-decoration:none;
+  font-weight:bold;
+  border-radius:8px;
+  transition:0.3s;
 }
 
-.primary{
- background:var(--accent);
- color:white;
- box-shadow:0 0 20px var(--accent);
+.btn:hover{
+  background:#00cccc;
+  transform:scale(1.05);
 }
 
-.primary:hover{
- transform:translateY(-5px);
-}
+/* للجوال */
+@media (max-width:768px){
 
-.secondary{
- background:transparent;
- border:2px solid var(--accent);
- color:white;
-}
+  body{
+    justify-content:center;
+    text-align:center;
+  }
 
-.secondary:hover{
- background:var(--accent);
-}
+  .content{
+    max-width:100%;
+  }
 
-/* الصورة يسار */
-.character{
- width:450px;
- filter:drop-shadow(0 0 40px var(--accent));
- animation:float 4s ease-in-out infinite;
-}
+  .content h1{
+    font-size:40px;
+  }
 
-@keyframes float{
- 0%,100%{transform:translateY(0);}
- 50%{transform:translateY(-20px);}
+  .content p{
+    font-size:18px;
+  }
 }
-
-/* زوم للجوال */
-@media(max-width:768px){
- body{
-  zoom:0.55;
- }
-}
-
 </style>
 </head>
+
 <body>
 
-<div class="wrapper">
-
-<nav>
- <div class="logo">DirtMc</div>
- <div class="menu">
-  <a href="#">الرئيسية</a>
-  <a href="#">المميزات</a>
-  <a href="#">السيرفرات</a>
-  <a href="https://discord.gg/dirtmc">ديسكورد</a>
- </div>
-</nav>
-
-<section class="hero">
-
- <div class="content">
-
-  <div class="badge">WELCOME TO THE FUTURE</div>
-
+<div class="content">
   <h1>DirtMc Server</h1>
+  <p>أفضل سيرفر ماينكرافت بستايل مظلم واحترافي.  
+  انضم الآن واستمتع بتجربة لعب خرافية.</p>
 
-  <p>
-  أفضل سيرفر QuickBox في المنطقة.  
-  حماية قوية، أداء مستقر، وتجربة لعب احترافية بدون لاق.
-  </p>
-
-  <div class="buttons">
-   <button class="btn primary" onclick="copyIP()">نسخ IP</button>
-   <button class="btn secondary">انضم للديسكورد</button>
-  </div>
-
- </div>
-
- <img src="netherite.png" class="character">
-
-</section>
-
+  <a href="#" class="btn">انضم الآن</a>
 </div>
-
-<script>
-
-function copyIP(){
- navigator.clipboard.writeText("play.dirtmc.net");
- alert("تم نسخ IP السيرفر!");
-}
-
-</script>
 
 </body>
 </html>
