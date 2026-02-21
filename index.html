@@ -1,426 +1,193 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>DirtMc — Heart Intro</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DirtMc Intro</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+
 <style>
-  :root{
-    --accent:#8b74ff;
-    --accent-2: #4ee6c2;
-    --text:#ffffff;
-    --overlay: rgba(4,4,8,0.6);
-  }
-  html,body{
-    height:100%;
-    margin:0;
-    font-family:"Poppins",system-ui,Segoe UI,Arial;
-    background: url('back.png') no-repeat center center;
-    background-size: cover;
-    background-color:#030308;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    overflow:hidden;
-    direction:rtl;
-  }
+html,body{
+  margin:0;
+  height:100%;
+  overflow:hidden;
+  background:#000;
+  font-family:'Poppins',sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
-  /* dark overlay so the heart is visible */
-  .veil{
-    position:fixed; inset:0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.24), rgba(0,0,0,0.6));
-    z-index:1;
-    pointer-events:none;
-  }
+/* Canvas */
+canvas{
+  position:absolute;
+  inset:0;
+}
 
-  /* full-screen canvas */
-  canvas#c{
-    position:fixed;
-    left:0; top:0;
-    width:100%; height:100%;
-    z-index:2;
-    display:block;
-  }
+/* Center Text */
+.center{
+  position:absolute;
+  text-align:center;
+  opacity:0;
+  transform:scale(.8);
+  transition:1s cubic-bezier(.2,.9,.3,1);
+}
 
-  /* center text that appears after animation */
-  .centerBox{
-    position:fixed;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:6;
-    pointer-events:none;
-  }
+.center.show{
+  opacity:1;
+  transform:scale(1);
+}
 
-  .textWrap{
-    text-align:center;
-    color:var(--text);
-    padding:24px 28px;
-    border-radius:14px;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    pointer-events:auto; /* buttons clickable */
-  }
+h1{
+  margin:0;
+  font-size:60px;
+  color:#fff;
+  letter-spacing:4px;
+  text-shadow:0 0 40px rgba(140,100,255,.6);
+  animation: glow 2s infinite alternate;
+}
 
-  .title{
-    font-size:54px;
-    font-weight:800;
-    letter-spacing:2px;
-    margin:0 0 8px 0;
-    text-shadow:
-      0 6px 32px rgba(139,116,255,0.18),
-      0 0 24px rgba(78,230,194,0.04);
+@keyframes glow{
+  from{ text-shadow:0 0 20px rgba(140,100,255,.4);}
+  to{ text-shadow:0 0 60px rgba(140,100,255,.9);}
+}
+
+/* Discord Button */
+.btn{
+  margin-top:25px;
+  padding:12px 28px;
+  border-radius:40px;
+  border:none;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:600;
+  background:linear-gradient(90deg,#7a6bff,#a29bff);
+  color:#fff;
+  box-shadow:0 10px 40px rgba(120,100,255,.4);
+  transition:.3s;
+  position:relative;
+  overflow:hidden;
+}
+
+.btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 15px 60px rgba(120,100,255,.7);
+}
+
+.btn:active{
+  transform:scale(.95);
+}
+
+/* ripple effect */
+.btn::after{
+  content:"";
+  position:absolute;
+  width:20px;
+  height:20px;
+  background:rgba(255,255,255,.5);
+  border-radius:50%;
+  transform:scale(0);
+  opacity:0;
+  pointer-events:none;
+}
+
+.btn.ripple::after{
+  animation:ripple .6s linear;
+}
+
+@keyframes ripple{
+  to{
+    transform:scale(15);
     opacity:0;
-    transform: translateY(8px) scale(0.98);
-    transition: all 700ms cubic-bezier(.2,.95,.25,1);
   }
+}
 
-  .subtitle{
-    font-size:18px;
-    color:rgba(255,255,255,0.88);
-    margin:0 0 18px 0;
-    opacity:0;
-    transition: all 700ms cubic-bezier(.2,.95,.25,1) 110ms;
-  }
-
-  .links{
-    display:flex;
-    gap:12px;
-    justify-content:center;
-    margin-top:6px;
-    opacity:0;
-    transition: all 700ms cubic-bezier(.2,.95,.25,1) 200ms;
-  }
-
-  .btn{
-    background: linear-gradient(90deg,var(--accent), #9aa0ff);
-    color:#fff;
-    border:0;
-    padding:10px 14px;
-    border-radius:12px;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow: 0 10px 34px rgba(139,116,255,0.16);
-    transform:translateY(0);
-  }
-
-  .btn.ghost{
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.06);
-    color:var(--text);
-  }
-
-  /* visible state */
-  .show .title{ opacity:1; transform:none; }
-  .show .subtitle{ opacity:1; transform:none; }
-  .show .links{ opacity:1; transform:none; }
-
-  /* replay small button top-left */
-  .replayBtn{
-    position:fixed;
-    left:18px; top:18px;
-    z-index:7;
-    background:rgba(255,255,255,0.06);
-    color:var(--text);
-    border:0;
-    padding:8px 10px;
-    border-radius:10px;
-    cursor:pointer;
-    backdrop-filter: blur(6px);
-  }
-
-  /* mobile tweaks */
-  @media (max-width:700px){
-    .title{ font-size:34px; }
-    .subtitle{ font-size:15px; }
-    .btn{ padding:10px 12px; font-size:14px; }
-  }
+@media(max-width:600px){
+  h1{ font-size:38px; }
+}
 </style>
 </head>
+
 <body>
 
-<div class="veil" aria-hidden="true"></div>
-<canvas id="c" aria-hidden="false"></canvas>
+<canvas id="heart"></canvas>
 
-<!-- center overlay for final text -->
-<div class="centerBox" aria-hidden="true">
-  <div class="textWrap" id="finalBox" style="pointer-events:none;">
-    <div class="title" id="finalTitle">DirtMc Server</div>
-    <div class="subtitle" id="finalSub">discord.gg/dirtmc</div>
-    <div class="links" id="finalLinks" aria-hidden="true" style="pointer-events:auto;">
-      <button class="btn" id="copyIP">Copy IP</button>
-      <a class="btn ghost" href="https://discord.gg/dirtmc" target="_blank" rel="noopener">Open Discord</a>
-    </div>
-  </div>
+<div class="center" id="centerText">
+  <h1>DirtMc</h1>
+  <button class="btn" id="discordBtn">Join Discord</button>
 </div>
 
-<button class="replayBtn" id="replay" title="Replay animation">Replay</button>
-
 <script>
-/*
-  Heart particle animation.
-  - Draws particles along a parametric heart curve.
-  - Animates "emission" for a few seconds with trails and glow.
-  - On finish shows the title + discord, plays a soft chime.
-  - Uses only back.png as background (provided by user).
-*/
+const canvas = document.getElementById('heart');
+const ctx = canvas.getContext('2d');
 
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d', { alpha: true });
-
-// DPR scaling
-function resize() {
-  const dpr = Math.max(1, window.devicePixelRatio || 1);
-  canvas.width = Math.round(innerWidth * dpr);
-  canvas.height = Math.round(innerHeight * dpr);
-  canvas.style.width = innerWidth + 'px';
-  canvas.style.height = innerHeight + 'px';
-  ctx.setTransform(dpr,0,0,dpr,0,0);
+function resize(){
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
 }
 resize();
 window.addEventListener('resize', resize);
 
-// heart parametric function (classic heart)
-function heartPoint(t, scale=1){
-  // produce coordinates roughly centered around (0,0)
-  const x = 16 * Math.pow(Math.sin(t), 3);
-  const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
-  return { x: x * scale, y: -y * scale }; // invert y to have heart upright
-}
-
-// convert heart coords to canvas coords
-function toCanvas(pt){
-  const cx = innerWidth * 0.35; // shift heart to left-of-center (visual area)
-  const cy = innerHeight * 0.45;
-  return { x: cx + pt.x, y: cy + pt.y };
-}
-
-// particles container
 let particles = [];
-let traces = [];
-let running = false;
-let startTime = 0;
-let duration = 4200; // ms for full heart emission
-let totalPoints = 320; // resolution of heart
-let emissionDone = false;
+let finished = false;
 
-// Utility random
-function rand(a,b){ return a + Math.random()*(b-a); }
-
-// create initial heart sample points scaled to viewport
-function buildHeartSamples(){
-  const size = Math.min(innerWidth, innerHeight) * 0.035; // scale factor
-  const samples = [];
-  for(let i=0;i<totalPoints;i++){
-    const t = i/totalPoints * Math.PI * 2;
-    const p = heartPoint(t, size);
-    samples.push(toCanvas(p));
+/* Heart equation */
+function heart(t){
+  return {
+    x: 16*Math.pow(Math.sin(t),3),
+    y: 13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)
   }
-  return samples;
 }
 
-let heartSamples = buildHeartSamples();
-window.addEventListener('resize', ()=> { heartSamples = buildHeartSamples(); });
-
-// particle emitter: spawn small glowing dots that move outward a bit and fade
-function spawnAt(x,y){
-  const hue = 270 + Math.random()*50; // purple-ish to cyan
-  const p = {
-    x, y,
-    vx: rand(-1.4,1.4),
-    vy: rand(-1.6,-0.2),
-    life: 600 + Math.random()*600,
-    born: performance.now(),
-    size: 1 + Math.random()*3,
-    hue
-  };
-  particles.push(p);
-  // also store a tiny trace for trail
-  traces.push({ x, y, a:1, life: 380 + Math.random()*300 });
+/* Create particles */
+for(let i=0;i<500;i++){
+  let t = Math.random()*Math.PI*2;
+  let pos = heart(t);
+  particles.push({
+    x: canvas.width/2 + pos.x*15,
+    y: canvas.height/2 - pos.y*15,
+    size: Math.random()*2+1,
+    alpha: Math.random()
+  });
 }
 
-// draw loop
-function render(now){
-  if(!running) return;
-  const t = now - startTime;
-  // clear with slight alpha to create trails
-  ctx.clearRect(0,0,innerWidth, innerHeight);
-  // subtle global tint to increase glow
-  ctx.fillStyle = 'rgba(0,0,0,0.14)';
-  ctx.fillRect(0,0,innerWidth,innerHeight);
+let start = performance.now();
 
-  // emission progress
-  const progress = Math.min(1, t / duration);
+function draw(now){
+  ctx.fillStyle="rgba(0,0,0,.15)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // spawn along heart proportionally to progress
-  const emitCount = Math.floor(progress * heartSamples.length);
-  for(let i=0;i<emitCount;i++){
-    // bias a bit to create random sparkles
-    if(Math.random() < 0.6){
-      const s = heartSamples[i];
-      // jitter slightly
-      spawnAt(s.x + rand(-6,6), s.y + rand(-6,6));
-    }
-  }
-
-  // update particles
-  for(let i = particles.length -1; i>=0; i--){
-    const p = particles[i];
-    const age = now - p.born;
-    if(age > p.life){
-      particles.splice(i,1);
-      continue;
-    }
-    // physics
-    p.vy += 0.02; // gravity tiny
-    p.x += p.vx;
-    p.y += p.vy;
-    const lifeRatio = 1 - (age / p.life);
-
-    // glow draw
+  particles.forEach(p=>{
     ctx.beginPath();
-    const gsize = p.size * (1.6 + (1-lifeRatio)*2.5);
-    ctx.fillStyle = `hsla(${p.hue},85%,65%,${0.28 * lifeRatio})`;
-    ctx.shadowColor = `hsla(${p.hue},85%,65%,${0.95 * lifeRatio})`;
-    ctx.shadowBlur = 22 * lifeRatio;
-    ctx.arc(p.x, p.y, gsize, 0, Math.PI*2);
+    ctx.fillStyle=`rgba(255,0,90,${p.alpha})`;
+    ctx.shadowColor="rgba(255,0,120,.8)";
+    ctx.shadowBlur=20;
+    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
     ctx.fill();
-    ctx.shadowBlur = 0;
-  }
+  });
 
-  // draw traces (soft)
-  for(let j = traces.length-1;j>=0;j--){
-    const tr = traces[j];
-    tr.life -= 16;
-    tr.a = Math.max(0, tr.life / 520);
-    if(tr.life <= 0) traces.splice(j,1);
-    else {
-      ctx.beginPath();
-      ctx.fillStyle = `rgba(255,255,255,${0.02 * tr.a})`;
-      ctx.arc(tr.x, tr.y, 6 * tr.a, 0, Math.PI*2);
-      ctx.fill();
-    }
-  }
-
-  // after full emission and particles quieted, finish
-  if(progress >= 1 && particles.length === 0){
-    // finish once
-    running = false;
-    showFinal();
-  } else {
-    requestAnimationFrame(render);
+  if(now-start < 4000){
+    requestAnimationFrame(draw);
+  }else if(!finished){
+    finished=true;
+    document.getElementById('centerText').classList.add('show');
   }
 }
 
-// start the animation
-function startAnim(){
-  // reset
-  particles = [];
-  traces = [];
-  running = true;
-  startTime = performance.now();
-  emissionDone = false;
-  // small initial burst center
-  const center = { x: innerWidth*0.5, y: innerHeight*0.35 };
-  for(let i=0;i<12;i++){
-    spawnAt(center.x + rand(-6,6), center.y + rand(-6,6));
-  }
-  // animate for duration + safety margin
-  requestAnimationFrame(render);
-}
+requestAnimationFrame(draw);
 
-// show final overlay
-const finalBox = document.getElementById('finalBox');
-const finalTitle = document.getElementById('finalTitle');
-const finalSub = document.getElementById('finalSub');
-const finalLinks = document.getElementById('finalLinks');
+/* Discord Button Effects */
+const btn = document.getElementById('discordBtn');
 
-function showFinal(){
-  // soft chime
-  playChime();
+btn.addEventListener('click', function(e){
+  btn.classList.remove('ripple');
+  void btn.offsetWidth;
+  btn.classList.add('ripple');
 
-  // make visible
-  finalBox.parentElement.setAttribute('aria-hidden','false');
-  // add class after tiny delay to allow repaint
-  setTimeout(()=> {
-    finalBox.classList.add('show');
-    finalBox.parentElement.style.pointerEvents = 'auto';
-    finalBox.style.pointerEvents = 'auto';
-    finalBox.classList.add('show'); // visual
-    document.querySelector('.centerBox').classList.add('show');
-    // toggle classes manually: we use class on parent to trigger CSS
-    document.querySelector('.centerBox').classList.add('show'); 
-    // also add .show on inner element by toggling its style
-    finalTitle.style.opacity = 1;
-    // use container to toggle visible
-    document.querySelector('.centerBox').classList.add('show');
-    document.getElementById('finalTitle').style.opacity = 1;
-    // add class to body for CSS
-    document.body.classList.add('hasFinal');
-  }, 40);
-
-  // fade in via CSS: we toggle .show on wrapper
-  setTimeout(()=>{
-    document.querySelector('.centerBox').classList.add('show');
-    // expose links
-    finalLinks.style.opacity = 1;
-  }, 180);
-}
-
-// soft chime using WebAudio
-function playChime(){
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const now = ctx.currentTime;
-    // bell-ish chord
-    const freqs = [560, 820, 1040];
-    freqs.forEach((f,i)=>{
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.setValueAtTime(f, now + 0.02*i);
-      g.gain.setValueAtTime(0.0001, now + 0.02*i);
-      g.gain.exponentialRampToValueAtTime(0.10 - i*0.02, now + 0.05);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.9 + i*0.06);
-      const bf = ctx.createBiquadFilter();
-      bf.type = 'lowpass';
-      bf.frequency.setValueAtTime(2600 - i*200, now);
-      o.connect(g); g.connect(bf); bf.connect(ctx.destination);
-      o.start(now + 0.02*i); o.stop(now + 1.0 + i*0.06);
-    });
-  }catch(e){
-    console.warn('Audio error:', e);
-  }
-}
-
-// copy IP handler
-document.getElementById('copyIP').addEventListener('click', async ()=>{
-  const ip = 'DirtMc.pro:21411';
-  try{
-    await navigator.clipboard.writeText(ip);
-    document.getElementById('copyIP').innerText = 'Copied ✓';
-    setTimeout(()=> document.getElementById('copyIP').innerText = 'Copy IP', 1400);
-  }catch(e){
-    prompt('Copy this IP:', ip);
-  }
+  // open discord
+  window.open("https://discord.gg/dirtmc","_blank");
 });
-
-// replay button
-document.getElementById('replay').addEventListener('click', ()=>{
-  // hide final
-  document.querySelector('.centerBox').classList.remove('show');
-  finalBox.style.pointerEvents = 'none';
-  document.body.classList.remove('hasFinal');
-  // small delay then restart
-  setTimeout(()=> {
-    startAnim();
-  }, 260);
-});
-
-// start immediately
-startAnim();
-
 </script>
+
 </body>
 </html>
