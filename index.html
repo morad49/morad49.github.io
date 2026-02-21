@@ -1,193 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DirtMc Intro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N.JEY - FUTURE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@400;600&display=swap');
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+        :root {
+            --bg-dark: #0a0b10;
+            --text-light: #ffffff;
+            --text-dim: #888888;
+            --accent-blue: #1c3dff;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
 
-<style>
-html,body{
-  margin:0;
-  height:100%;
-  overflow:hidden;
-  background:black;
-  font-family:'Poppins',sans-serif;
-}
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+        }
 
-/* Canvas Heart */
-canvas{
-  position:absolute;
-  inset:0;
-}
+        /* تخطيط الصفحة (شبكة) */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+            position: relative;
+        }
 
-/* Final Screen */
-.final{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  flex-direction:column;
-  opacity:0;
-  transform:scale(0.8);
-  transition:1s cubic-bezier(.2,.9,.3,1);
-  color:white;
-  z-index:5;
-}
+        /* خطوط الطول (الحدود الوهمية في التصميم) */
+        .grid-lines {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .grid-lines div {
+            border-right: 1px solid var(--border-color);
+        }
 
-.final.show{
-  opacity:1;
-  transform:scale(1);
-}
+        /* القائمة العلوية */
+        header {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 50px;
+            z-index: 10;
+            border-bottom: 1px solid var(--border-color);
+        }
 
-.final h1{
-  font-size:70px;
-  margin:0;
-  text-shadow:0 0 40px #7a6bff;
-  animation:glow 2s infinite alternate;
-}
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
 
-@keyframes glow{
-  from{ text-shadow:0 0 20px #7a6bff;}
-  to{ text-shadow:0 0 60px #a29bff;}
-}
+        nav {
+            display: flex;
+            gap: 40px;
+        }
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-.btn{
-  margin-top:25px;
-  padding:12px 30px;
-  border-radius:40px;
-  border:none;
-  font-weight:bold;
-  font-size:16px;
-  cursor:pointer;
-  background:linear-gradient(90deg,#7a6bff,#a29bff);
-  color:white;
-  box-shadow:0 10px 40px rgba(120,100,255,.4);
-  transition:.3s;
-}
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .lang {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .lang span { color: var(--text-dim); }
+        
+        .menu-btn {
+            display: grid;
+            grid-template-columns: repeat(3, 4px);
+            gap: 3px;
+            cursor: pointer;
+        }
+        .menu-btn div {
+            width: 4px; height: 4px;
+            background-color: var(--text-light);
+        }
 
-.btn:hover{
-  transform:scale(1.1);
-}
-</style>
+        /* القسم الأيسر (النصوص) */
+        .left-panel {
+            padding: 0 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .subtitle {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .blue-box {
+            width: 20px;
+            height: 40px;
+            background-color: var(--accent-blue);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 90px;
+            margin: 0 0 20px 0;
+            letter-spacing: 10px;
+            font-weight: 700;
+        }
+
+        .description {
+            color: var(--text-dim);
+            font-size: 14px;
+            max-width: 400px;
+            line-height: 1.6;
+            margin-bottom: 50px;
+            padding-left: 20px;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-light);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+        .btn:hover {
+            background: var(--text-light);
+            color: var(--bg-dark);
+        }
+
+        /* القسم الأيمن (الروبوت والمعلومات) */
+        .right-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 50px;
+            z-index: 1;
+            /* وضعت لون متدرج كخلفية بديلة لصورة الروبوت */
+            background: radial-gradient(circle at center, rgba(30,30,40,1) 0%, var(--bg-dark) 70%);
+        }
+
+        /* نصوص المؤشرات (ARTIFICIAL INTELLIGENCE الخ) */
+        .annotation {
+            position: absolute;
+            font-size: 10px;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .annotation::before {
+            content: '';
+            display: block;
+            width: 30px;
+            height: 1px;
+            background-color: var(--border-color);
+        }
+        .anno-1 { top: 30%; right: 20%; }
+        .anno-2 { bottom: 40%; left: 20%; flex-direction: row-reverse; }
+        .anno-2::before { display: none; }
+        .anno-2::after { content: ''; display: block; width: 30px; height: 1px; background-color: var(--border-color); }
+
+        /* الكروت السفلية */
+        .info-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 30px;
+        }
+        .card h3 {
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin: 0 0 10px 0;
+        }
+        .card p {
+            color: var(--text-dim);
+            font-size: 12px;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* شريط السوشيال ميديا الجانبي */
+        .social-sidebar {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 10;
+        }
+        .social-sidebar a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .social-sidebar a:hover { color: var(--text-light); }
+
+    </style>
 </head>
 <body>
 
-<canvas id="heart"></canvas>
+    <div class="grid-lines">
+        <div></div><div></div><div></div><div></div>
+    </div>
 
-<div class="final" id="final">
-  <h1>DirtMc</h1>
-  <button class="btn" onclick="openDiscord()">Join Discord</button>
-</div>
+    <header>
+        <div class="logo">N.JEY</div>
+        <nav>
+            <a href="#">HOME</a>
+            <a href="#">ABOUT</a>
+            <a href="#">WORKS</a>
+            <a href="#">SERVICES</a>
+            <a href="#">CONTACTS</a>
+        </nav>
+        <div class="header-right">
+            <div class="lang">ENG <span>RUS</span></div>
+            <div class="menu-btn">
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div>
+                <div></div><div></div><div></div>
+            </div>
+        </div>
+    </header>
 
-<script>
+    <div class="container">
+        <div class="left-panel">
+            <div class="subtitle">
+                <div class="blue-box"></div>
+                HERE AND NOW
+            </div>
+            <h1>FUTURE</h1>
+            <p class="description">
+                People who think about the future, about how to improve their lives, and take action in this direction, have a plan of action.
+            </p>
+            <button class="btn">LET'S GO</button>
+        </div>
 
-/* ===== HEART ANIMATION ===== */
+        <div class="right-panel">
+            <div class="annotation anno-1">ARTIFICIAL INTELLIGENCE</div>
+            <div class="annotation anno-2">NO EMOTION</div>
 
-const canvas = document.getElementById("heart");
-const ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+            <div class="info-cards">
+                <div class="card">
+                    <h3>TECHNOLOGY</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed</p>
+                </div>
+                <div class="card">
+                    <h3>INNOVATION</h3>
+                    <p>Tempor incididunt ut labore et dolore magna aliqua</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-window.onresize = ()=>{
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-};
-
-let particles = [];
-let total = 350;
-
-/* Heart Formula */
-function heart(t){
-  return {
-    x: 16*Math.pow(Math.sin(t),3),
-    y: 13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)
-  };
-}
-
-/* Create Particles */
-for(let i=0;i<total;i++){
-  let t = Math.random()*Math.PI*2;
-  let p = heart(t);
-  particles.push({
-    x: canvas.width/2 + p.x*18,
-    y: canvas.height/2 - p.y*18,
-    vx:(Math.random()-0.5)*2,
-    vy:(Math.random()-0.5)*2,
-    life:200+Math.random()*200
-  });
-}
-
-let start = performance.now();
-
-function draw(now){
-  ctx.fillStyle="rgba(0,0,0,0.15)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  particles.forEach((p,i)=>{
-    p.x += p.vx;
-    p.y += p.vy;
-    p.life--;
-
-    ctx.beginPath();
-    ctx.fillStyle="rgba(255,0,120,0.8)";
-    ctx.shadowColor="#ff0077";
-    ctx.shadowBlur=20;
-    ctx.arc(p.x,p.y,2.5,0,Math.PI*2);
-    ctx.fill();
-
-    if(p.life<=0){
-      particles.splice(i,1);
-    }
-  });
-
-  if(particles.length>0){
-    requestAnimationFrame(draw);
-  }else{
-    showFinal();
-  }
-}
-
-requestAnimationFrame(draw);
-
-/* ===== SHOW FINAL SCREEN ===== */
-
-function showFinal(){
-  const final = document.getElementById("final");
-  setTimeout(()=>{
-    final.classList.add("show");
-    playSound();
-  },500);
-}
-
-/* ===== SOUND ===== */
-
-function playSound(){
-  try{
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type="sine";
-    o.frequency.value=800;
-    g.gain.setValueAtTime(0.1,ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+1);
-    o.connect(g);
-    g.connect(ctx.destination);
-    o.start();
-    o.stop(ctx.currentTime+1);
-  }catch(e){}
-}
-
-/* ===== DISCORD ===== */
-
-function openDiscord(){
-  window.open("https://discord.gg/dirtmc","_blank");
-}
-
-</script>
+    <div class="social-sidebar">
+        <a href="#">Vk</a>
+        <a href="#">Tw</a>
+        <a href="#">Fb</a>
+        <a href="#">In</a>
+        <a href="#">Be</a>
+    </div>
 
 </body>
 </html>
