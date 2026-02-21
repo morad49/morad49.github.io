@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DirtMc | نظام الحماية والأرشفة العالمية</title>
+    <title>DirtMc | Global Security & Archive</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <style>
+        /* تصميم مستوحى من واجهة FUTURE */
         :root {
             --bg: #0a0b10;
-            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-bg: rgba(255, 255, 255, 0.02);
             --text: #ffffff;
             --accent: #1c3dff;
             --border: rgba(255, 255, 255, 0.1);
@@ -29,13 +30,16 @@
             margin: 0;
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             transition: 0.5s;
             overflow: hidden;
+            /* خلفية الشبكة الهندسية */
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
         }
 
         .theme-toggle {
@@ -49,46 +53,48 @@
 
         .auth-container {
             background: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
+            padding: 50px 40px;
+            border-radius: 4px;
+            border-left: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            border-right: 5px solid var(--accent); /* التميز البصري من الصورة */
             backdrop-filter: blur(15px);
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            z-index: 10;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
         }
 
-        h2 { margin-bottom: 20px; font-weight: 600; }
+        h2 { font-size: 24px; letter-spacing: 6px; margin-bottom: 30px; font-weight: 700; color: #fff; }
 
         input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            margin: 12px 0;
+            background: rgba(255,255,255,0.03);
             border: 1px solid var(--border);
-            border-radius: 8px;
             color: var(--text);
             box-sizing: border-box;
             outline: none;
+            font-size: 14px;
+            letter-spacing: 1px;
         }
 
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             background: var(--accent);
             border: none;
             color: white;
-            font-weight: bold;
-            border-radius: 8px;
+            font-weight: 800;
             cursor: pointer;
-            margin-top: 15px;
-            transition: 0.3s;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: 0.4s;
         }
-
-        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
-        .btn:disabled { background: #444; cursor: not-allowed; }
+        .btn:hover { background: #fff; color: var(--accent); }
+        .btn:disabled { background: #222; cursor: not-allowed; color: #555; }
 
         #dirtScreen {
             position: fixed;
@@ -102,15 +108,20 @@
         }
 
         #dirtText {
-            font-size: clamp(80px, 15vw, 150px);
-            font-family: 'Courier New', monospace;
-            text-shadow: 0 0 30px var(--accent);
+            font-size: clamp(60px, 15vw, 160px);
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 900;
+            letter-spacing: 25px;
             margin: 0;
             color: #fff;
+            text-shadow: 0 0 60px var(--accent);
+            animation: pulse 2s infinite;
         }
 
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
         .hidden { display: none; }
-        .switch-link { margin-top: 15px; display: block; color: var(--accent); cursor: pointer; font-size: 14px; }
+        .switch-link { margin-top: 25px; display: block; color: var(--accent); cursor: pointer; font-size: 11px; letter-spacing: 2px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -120,72 +131,62 @@
     </div>
 
     <div id="registerBox" class="auth-container">
-        <h2>إنشاء حساب</h2>
-        <input type="text" id="regUser" placeholder="اسم المستخدم">
-        <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
-        <button class="btn" id="regSendBtn" onclick="handleSendEmail('register')">إرسال كود التحقق</button>
+        <h2>REGISTER</h2>
+        <input type="text" id="regUser" placeholder="USERNAME">
+        <input type="email" id="regEmail" placeholder="EMAIL ADDRESS">
+        <button class="btn" id="regSendBtn" onclick="handleAuth('register')">GET CODE</button>
         
         <div id="regVerify" class="hidden">
-            <input type="text" id="regCodeInput" placeholder="أدخل الكود">
-            <button class="btn" onclick="finishRegister()">تأكيد وحفظ في الأرشيف</button>
+            <input type="text" id="regCodeInput" placeholder="ENTER 4-DIGIT CODE">
+            <button class="btn" onclick="completeRegister()">ARCHIVE ACCOUNT</button>
         </div>
-        <span class="switch-link" onclick="showBox('loginBox')">لديك حساب؟ دخول</span>
+        <span class="switch-link" onclick="showBox('loginBox')">ALREADY ARCHIVED? LOGIN</span>
     </div>
 
     <div id="loginBox" class="auth-container hidden">
-        <h2>تسجيل الدخول</h2>
-        <input type="text" id="loginUser" placeholder="اسم المستخدم">
-        <button class="btn" id="loginSendBtn" onclick="handleSendEmail('login')">إرسال كود 2FA</button>
+        <h2>LOGIN</h2>
+        <input type="text" id="loginUser" placeholder="USERNAME">
+        <button class="btn" id="loginSendBtn" onclick="handleAuth('login')">REQUEST 2FA</button>
         
         <div id="login2FA" class="hidden">
-            <input type="text" id="loginCodeInput" placeholder="أدخل كود 2FA">
-            <button class="btn" onclick="finishLogin()">دخول</button>
+            <input type="text" id="loginCodeInput" placeholder="ENTER 2FA CODE">
+            <button class="btn" onclick="completeLogin()">AUTHORIZE ACCESS</button>
         </div>
-        <span class="switch-link" onclick="showBox('registerBox')">حساب جديد</span>
+        <span class="switch-link" onclick="showBox('registerBox')">NEW USER? CREATE ARCHIVE</span>
     </div>
 
     <div id="dirtScreen">
         <h1 id="dirtText">DIRT</h1>
-        <a href="https://Discord.gg/dirtmc" target="_blank" style="color: #5865F2; text-decoration: none; font-size: 24px; margin-top: 20px;">Discord.gg/dirtmc</a>
-        <button class="btn" style="width: auto; padding: 10px 30px; margin-top: 40px; background: #222;" onclick="logout()">خروج</button>
+        <a href="https://Discord.gg/dirtmc" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 14px; margin-top: 40px; letter-spacing: 8px; font-weight: bold;">DISCORD.GG/DIRTMC</a>
+        <button class="btn" style="width: auto; padding: 12px 50px; margin-top: 60px; background: transparent; border: 1px solid #333;" onclick="logout()">TERMINATE SESSION</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 
-        // 1. إعدادات FIREBASE (استبدلها ببياناتك)
+        // يرجى تعبئة بيانات Firebase الخاصة بك هنا ليعمل الأرشيف العام
         const firebaseConfig = {
-            apiKey: "YOUR_FIREBASE_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "ضع_هنا_API_KEY",
+            authDomain: "مشروعك.firebaseapp.com",
+            projectId: "مشروعك_ID",
+            storageBucket: "مشروعك.appspot.com",
+            messagingSenderId: "ID_المرسل",
+            appId: "APP_ID"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-        // جعلها متاحة للدوال العادية
-        window.db = db;
-        window.doc = doc;
-        window.setDoc = setDoc;
-        window.getDoc = getDoc;
+        window.fBase = { db, doc, setDoc, getDoc };
     </script>
 
     <script>
-        // 2. إعدادات EMAILJS (استبدلها ببياناتك)
+        // تفعيل مفتاح EmailJS (يجب وضعه لكي لا يظهر خطأ Public Key Invalid)
         (function() {
-            emailjs.init("YOUR_PUBLIC_KEY"); // Public Key من EmailJS
+            emailjs.init("ضع_هنا_PUBLIC_KEY_الخاص_بك"); 
         })();
 
         let generatedCode = null;
-
-        // التحقق من حالة الدخول السابقة
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            document.getElementById('dirtScreen').style.display = 'flex';
-        }
 
         function toggleTheme() {
             document.body.classList.toggle('light-mode');
@@ -198,78 +199,71 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // دالة إرسال الإيميل المشتركة
-        async function handleSendEmail(type) {
-            let email = "";
+        async function handleAuth(type) {
             const user = (type === 'register') ? document.getElementById('regUser').value : document.getElementById('loginUser').value;
+            let email = "";
 
-            if (!user) return alert("يرجى إدخال اسم المستخدم");
+            if (!user) return alert("REQUIRED: USERNAME");
 
             if (type === 'register') {
                 email = document.getElementById('regEmail').value;
-                if (!email) return alert("يرج / إدخال الإيميل");
+                if (!email) return alert("REQUIRED: EMAIL");
             } else {
-                // جلب الإيميل من Firebase للـ Login
-                const userRef = window.doc(window.db, "users", user);
-                const snap = await window.getDoc(userRef);
+                // جلب الإيميل من قاعدة البيانات السحابية (Global Archive)
+                const userRef = window.fBase.doc(window.fBase.db, "users", user);
+                const snap = await window.fBase.getDoc(userRef);
                 if (snap.exists()) {
                     email = snap.data().email;
                 } else {
-                    return alert("هذا المستخدم غير مسجل في الأرشيف العام!");
+                    return alert("ERROR: USER NOT FOUND IN ARCHIVE");
                 }
             }
 
             generatedCode = Math.floor(1000 + Math.random() * 9000);
             const btn = (type === 'register') ? document.getElementById('regSendBtn') : document.getElementById('loginSendBtn');
+            btn.innerText = "PROCESSING...";
             btn.disabled = true;
-            btn.innerText = "جاري الإرسال...";
 
+            // إرسال الإيميل باستخدام الـ Service ID الخاص بك: service_nd6soio
             emailjs.send("service_nd6soio", "YOUR_TEMPLATE_ID", {
                 to_email: email,
-                verification_code: generatedCode,
-                user_name: user
+                verification_code: generatedCode
             }).then(() => {
-                alert("تم إرسال كود التحقق إلى " + email);
-                btn.innerText = "تم الإرسال";
+                alert("SUCCESS: CODE DISPATCHED TO " + email);
+                btn.innerText = "CODE SENT";
                 if (type === 'register') document.getElementById('regVerify').classList.remove('hidden');
                 else document.getElementById('login2FA').classList.remove('hidden');
             }).catch(err => {
-                alert("فشل الإرسال: " + err.text);
+                alert("FAILURE: CHECK YOUR PUBLIC KEY");
                 btn.disabled = false;
+                btn.innerText = "RETRY";
             });
         }
 
-        // حفظ في الأرشيف العام (Firebase)
-        async function finishRegister() {
+        async function completeRegister() {
             const code = document.getElementById('regCodeInput').value;
             const user = document.getElementById('regUser').value;
             const email = document.getElementById('regEmail').value;
 
             if (code == generatedCode) {
-                try {
-                    await window.setDoc(window.doc(window.db, "users", user), {
-                        username: user,
-                        email: email
-                    });
-                    alert("تم الحفظ في الأرشيف العام! يمكنك الآن الدخول من أي جهاز.");
-                    showBox('loginBox');
-                } catch (e) { alert("خطأ في القاعدة: " + e); }
-            } else alert("كود التحقق خاطئ!");
+                // حفظ الحساب في الأرشيف العام (يمكن فتحه من أي جهاز)
+                await window.fBase.setDoc(window.fBase.doc(window.fBase.db, "users", user), {
+                    username: user,
+                    email: email,
+                    created_at: new Date()
+                });
+                alert("GLOBAL ARCHIVE CREATED! REDIRECTING TO LOGIN...");
+                showBox('loginBox');
+            } else alert("ERROR: INVALID CODE");
         }
 
-        // الدخول من الأرشيف العام
-        async function finishLogin() {
-            const code = document.getElementById('loginCodeInput').value;
-            if (code == generatedCode) {
-                localStorage.setItem('isLoggedIn', 'true');
+        function completeLogin() {
+            if (document.getElementById('loginCodeInput').value == generatedCode) {
                 document.getElementById('dirtScreen').style.display = 'flex';
-            } else alert("كود 2FA غلط!");
+            } else alert("ERROR: INVALID 2FA");
         }
 
-        function logout() {
-            localStorage.setItem('isLoggedIn', 'false');
-            location.reload();
-        }
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
