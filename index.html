@@ -1,465 +1,425 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DirtMc — Play Now</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DirtMc — Heart Intro</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-dark: #06060a;
-    --card: rgba(12,12,18,0.62);
-    --accent: #7b6bff;
-    --accent-2:#4ee6c2;
-    --white: #f6f7fb;
-    --muted: #d3d6df;
+    --accent:#8b74ff;
+    --accent-2: #4ee6c2;
+    --text:#ffffff;
+    --overlay: rgba(4,4,8,0.6);
   }
-
   html,body{
     height:100%;
     margin:0;
-    font-family:"Poppins",system-ui,Segoe UI,Roboto,Arial;
+    font-family:"Poppins",system-ui,Segoe UI,Arial;
     background: url('back.png') no-repeat center center;
     background-size: cover;
-    background-color: var(--bg-dark);
+    background-color:#030308;
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
-    overflow-x:hidden;
+    overflow:hidden;
+    direction:rtl;
   }
 
-  /* dark overlay so text is readable */
-  body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.75) 100%);
-    z-index:0;
+  /* dark overlay so the heart is visible */
+  .veil{
+    position:fixed; inset:0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.24), rgba(0,0,0,0.6));
+    z-index:1;
     pointer-events:none;
   }
 
-  /* center container */
-  .stage{
-    min-height:100vh;
+  /* full-screen canvas */
+  canvas#c{
+    position:fixed;
+    left:0; top:0;
+    width:100%; height:100%;
+    z-index:2;
+    display:block;
+  }
+
+  /* center text that appears after animation */
+  .centerBox{
+    position:fixed;
+    inset:0;
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:4vw;
-    z-index:1;
-    position:relative;
+    z-index:6;
+    pointer-events:none;
   }
 
-  .card{
-    width:min(980px,96%);
-    background: var(--card);
-    border-radius:20px;
-    padding:36px;
-    display:flex;
-    gap:28px;
-    align-items:center;
-    justify-content:space-between;
-    box-shadow: 0 10px 40px rgba(10,8,20,0.6), 0 0 60px rgba(123,107,255,0.06) inset;
-    position:relative;
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,0.03);
-    backdrop-filter: blur(8px) saturate(120%);
+  .textWrap{
+    text-align:center;
+    color:var(--text);
+    padding:24px 28px;
+    border-radius:14px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    pointer-events:auto; /* buttons clickable */
   }
 
-  /* right side = description (text should be on the right) */
-  .desc{
-    flex:1;
-    text-align:right;
-    direction:rtl;
-    color:var(--white);
+  .title{
+    font-size:54px;
+    font-weight:800;
+    letter-spacing:2px;
+    margin:0 0 8px 0;
+    text-shadow:
+      0 6px 32px rgba(139,116,255,0.18),
+      0 0 24px rgba(78,230,194,0.04);
+    opacity:0;
+    transform: translateY(8px) scale(0.98);
+    transition: all 700ms cubic-bezier(.2,.95,.25,1);
   }
 
-  .logo{
-    font-weight:700;
-    color:var(--accent);
-    letter-spacing:1px;
-    font-size:20px;
-    margin-bottom:6px;
-    text-shadow:0 4px 18px rgba(123,107,255,0.12);
+  .subtitle{
+    font-size:18px;
+    color:rgba(255,255,255,0.88);
+    margin:0 0 18px 0;
+    opacity:0;
+    transition: all 700ms cubic-bezier(.2,.95,.25,1) 110ms;
   }
 
-  h1{
-    margin:0 0 10px 0;
-    font-size:44px;
-    line-height:1;
-    color:var(--white);
-    text-shadow: 0 8px 40px rgba(0,0,0,0.6);
-  }
-
-  p.lead{
-    margin:10px 0 24px 0;
-    color:var(--muted);
-    font-size:17px;
-    max-width:520px;
-    line-height:1.6;
-  }
-
-  .meta{
+  .links{
     display:flex;
     gap:12px;
-    align-items:center;
-    justify-content:flex-end;
-    margin-bottom:22px;
-    flex-wrap:wrap;
-  }
-
-  .chip{
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    padding:10px 14px;
-    border-radius:12px;
-    font-weight:600;
-    color:var(--white);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-    border:1px solid rgba(255,255,255,0.02);
-    display:flex;
-    gap:8px;
-    align-items:center;
-    font-size:14px;
-  }
-
-  .chip .label{ opacity:0.85; font-weight:500; color:var(--muted); font-size:13px; }
-
-  .actions{
-    display:flex;
-    gap:14px;
-    justify-content:flex-end;
-    align-items:center;
+    justify-content:center;
+    margin-top:6px;
+    opacity:0;
+    transition: all 700ms cubic-bezier(.2,.95,.25,1) 200ms;
   }
 
   .btn{
-    -webkit-tap-highlight-color: transparent;
+    background: linear-gradient(90deg,var(--accent), #9aa0ff);
+    color:#fff;
     border:0;
-    cursor:pointer;
-    padding:12px 18px;
+    padding:10px 14px;
     border-radius:12px;
     font-weight:700;
-    font-size:15px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
-    transition: transform .18s ease, box-shadow .18s ease;
-    display:inline-flex;
-    gap:10px;
-    align-items:center;
-  }
-
-  .btn:active{ transform: translateY(2px) scale(.998); }
-
-  .btn.primary{
-    background: linear-gradient(90deg, var(--accent), #9aa0ff);
-    color: #fff;
-    padding:12px 22px;
-    box-shadow: 0 12px 40px rgba(123,107,255,0.18);
-    border:1px solid rgba(255,255,255,0.04);
+    cursor:pointer;
+    box-shadow: 0 10px 34px rgba(139,116,255,0.16);
+    transform:translateY(0);
   }
 
   .btn.ghost{
-    background: transparent;
-    color:var(--white);
-    border: 1px solid rgba(255,255,255,0.06);
-    padding:10px 14px;
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.06);
+    color:var(--text);
   }
 
-  .btn.small{
-    padding:8px 12px;
+  /* visible state */
+  .show .title{ opacity:1; transform:none; }
+  .show .subtitle{ opacity:1; transform:none; }
+  .show .links{ opacity:1; transform:none; }
+
+  /* replay small button top-left */
+  .replayBtn{
+    position:fixed;
+    left:18px; top:18px;
+    z-index:7;
+    background:rgba(255,255,255,0.06);
+    color:var(--text);
+    border:0;
+    padding:8px 10px;
     border-radius:10px;
-    font-size:13px;
+    cursor:pointer;
+    backdrop-filter: blur(6px);
   }
 
-  /* left side - decorative shapes & subtle glow (no images used) */
-  .visual{
-    width:380px;
-    min-width:260px;
-    height:260px;
-    position:relative;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    pointer-events:none;
+  /* mobile tweaks */
+  @media (max-width:700px){
+    .title{ font-size:34px; }
+    .subtitle{ font-size:15px; }
+    .btn{ padding:10px 12px; font-size:14px; }
   }
-
-  /* soft glowing orb */
-  .orb{
-    position:absolute;
-    width:300px;
-    height:300px;
-    border-radius:50%;
-    background: radial-gradient(circle at 30% 30%, rgba(78,230,194,0.14), transparent 20%),
-                radial-gradient(circle at 70% 70%, rgba(123,107,255,0.12), transparent 25%);
-    filter: blur(24px);
-    transform: scale(.9);
-  }
-
-  /* polygon shapes */
-  .poly{
-    position:absolute;
-    width:120px;
-    height:120px;
-    border-radius:16px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08));
-    border: 1px solid rgba(255,255,255,0.03);
-    transform: rotate(15deg);
-    box-shadow: 0 16px 50px rgba(0,0,0,0.6);
-  }
-
-  .poly.one{ right:18px; top:8px; transform: rotate(-6deg) scale(1.05); width:140px; height:140px; border-radius:18px; }
-  .poly.two{ left:14px; bottom:10px; transform: rotate(22deg) scale(.9); width:110px; height:110px; border-radius:14px; }
-
-  /* subtle animated lines */
-  .lines{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    mix-blend-mode:screen;
-  }
-
-  .line{
-    position:absolute;
-    width:2px;
-    height:120%;
-    background: linear-gradient(180deg, rgba(123,107,255,0.12), transparent 60%);
-    left:40%;
-    transform: translateX(-50%) rotate(10deg);
-    opacity:0.7;
-    filter:blur(10px);
-    animation: drift 6s linear infinite;
-  }
-  @keyframes drift{ 0%{ transform:translateY(-8%) rotate(8deg) } 50%{ transform:translateY(8%) rotate(-6deg) } 100%{ transform:translateY(-8%) rotate(8deg) } }
-
-  /* particle container (for click effects) */
-  .particles{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    z-index:8;
-  }
-
-  /* small footer note */
-  .foot{
-    margin-top:14px;
-    color: #bfc4d0;
-    font-size:13px;
-    opacity:0.9;
-    text-align:right;
-  }
-
-  /* responsive tweaks */
-  @media (max-width:880px){
-    .card{ flex-direction:column-reverse; gap:18px; padding:20px; align-items:center; text-align:center; }
-    .desc{ text-align:center; direction:ltr; }
-    .meta{ justify-content:center; }
-    .actions{ justify-content:center; }
-    .visual{ width:86%; height:200px; min-width:auto; }
-  }
-
 </style>
 </head>
 <body>
-  <div class="stage">
-    <div class="card" role="region" aria-label="DirtMc server card">
 
-      <div class="desc" id="desc">
-        <div class="logo">DirtMc</div>
-        <h1>Play DirtMc Now</h1>
+<div class="veil" aria-hidden="true"></div>
+<canvas id="c" aria-hidden="false"></canvas>
 
-        <p class="lead">
-          Join the friendly DirtMc community — stable performance, custom features, and nonstop adventure.
-          Fast setup. Active staff. Unique game modes.
-        </p>
-
-        <div class="meta" aria-hidden="false">
-          <div class="chip"><span class="label">IP</span>&nbsp;<strong id="ipLabel">DirtMc.pro:21411</strong></div>
-          <div class="chip"><span class="label">Discord</span>&nbsp;<strong>discord.gg/dirtmc</strong></div>
-          <div class="chip"><span class="label">Mode</span>&nbsp;<strong>Survival / Mini-Games</strong></div>
-        </div>
-
-        <div class="actions">
-          <button class="btn primary" id="copyBtn" title="Copy server IP">Copy IP</button>
-          <a class="btn ghost small" href="https://discord.gg/dirtmc" target="_blank" id="joinBtn">Join Discord</a>
-        </div>
-
-        <div class="foot">Server: DirtMc.pro:21411 • Port: 21411 • Discord: discord.gg/dirtmc</div>
-      </div>
-
-      <div class="visual" aria-hidden="true">
-        <div class="orb"></div>
-        <div class="poly one"></div>
-        <div class="poly two"></div>
-        <div class="lines"><div class="line"></div></div>
-
-        <!-- particle layer -->
-        <div class="particles" id="particles"></div>
-      </div>
-
+<!-- center overlay for final text -->
+<div class="centerBox" aria-hidden="true">
+  <div class="textWrap" id="finalBox" style="pointer-events:none;">
+    <div class="title" id="finalTitle">DirtMc Server</div>
+    <div class="subtitle" id="finalSub">discord.gg/dirtmc</div>
+    <div class="links" id="finalLinks" aria-hidden="true" style="pointer-events:auto;">
+      <button class="btn" id="copyIP">Copy IP</button>
+      <a class="btn ghost" href="https://discord.gg/dirtmc" target="_blank" rel="noopener">Open Discord</a>
     </div>
   </div>
+</div>
+
+<button class="replayBtn" id="replay" title="Replay animation">Replay</button>
 
 <script>
-/* -------------------------
-   PARTICLES + RING EFFECT
-   ------------------------- */
-const particlesRoot = document.getElementById('particles');
-const copyBtn = document.getElementById('copyBtn');
-const joinBtn = document.getElementById('joinBtn');
+/*
+  Heart particle animation.
+  - Draws particles along a parametric heart curve.
+  - Animates "emission" for a few seconds with trails and glow.
+  - On finish shows the title + discord, plays a soft chime.
+  - Uses only back.png as background (provided by user).
+*/
 
-function makeBurst(x, y) {
-  const count = 18;
-  for (let i=0;i<count;i++){
-    const el = document.createElement('span');
-    el.className = 'p';
-    const size = 8 + Math.random()*16;
-    el.style.position='absolute';
-    el.style.left = x + 'px';
-    el.style.top = y + 'px';
-    el.style.width = size + 'px';
-    el.style.height = size + 'px';
-    el.style.borderRadius = (Math.random()>0.6? '20%':'50%');
-    const hue = 160 + Math.round(Math.random()*90);
-    const sat = 60 + Math.round(Math.random()*20);
-    el.style.background = `linear-gradient(45deg, hsla(${hue},${sat}%,80%,0.95), hsla(${hue+30},${sat}%,65%,0.95))`;
-    el.style.boxShadow = `0 6px 18px rgba(0,0,0,0.35), 0 0 16px rgba(255,255,255,0.04) inset`;
-    el.style.transform = 'translate(-50%,-50%) scale(0.6)';
-    el.style.opacity = '1';
-    el.style.transition = 'transform 700ms cubic-bezier(.15,.9,.25,1), opacity 700ms ease';
-    particlesRoot.appendChild(el);
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d', { alpha: true });
 
-    // animate
-    const angle = (Math.PI*2) * (i / count) + (Math.random()*0.4 - 0.2);
-    const dist = 60 + Math.random()*120;
-    requestAnimationFrame(()=> {
-      el.style.transform = `translate(${Math.cos(angle)*dist - 50}%, ${Math.sin(angle)*dist - 50}%) scale(0.9)`;
-      el.style.opacity = '0';
-    });
+// DPR scaling
+function resize() {
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.round(innerWidth * dpr);
+  canvas.height = Math.round(innerHeight * dpr);
+  canvas.style.width = innerWidth + 'px';
+  canvas.style.height = innerHeight + 'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize();
+window.addEventListener('resize', resize);
 
-    // remove
-    setTimeout(()=> el.remove(), 900 + Math.random()*260);
-  }
-
-  // pulse ring
-  const ring = document.createElement('div');
-  ring.style.position='absolute';
-  ring.style.left = x + 'px';
-  ring.style.top = y + 'px';
-  ring.style.width='24px';
-  ring.style.height='24px';
-  ring.style.borderRadius='50%';
-  ring.style.border = `2px solid rgba(255,255,255,0.18)`;
-  ring.style.transform='translate(-50%,-50%) scale(0.8)';
-  ring.style.opacity='0.9';
-  ring.style.boxShadow = `0 0 28px rgba(123,107,255,0.12)`;
-  ring.style.transition = 'transform 650ms cubic-bezier(.15,.9,.25,1), opacity 650ms ease';
-  particlesRoot.appendChild(ring);
-  requestAnimationFrame(()=> {
-    ring.style.transform='translate(-50%,-50%) scale(6)';
-    ring.style.opacity='0';
-  });
-  setTimeout(()=> ring.remove(), 700);
+// heart parametric function (classic heart)
+function heartPoint(t, scale=1){
+  // produce coordinates roughly centered around (0,0)
+  const x = 16 * Math.pow(Math.sin(t), 3);
+  const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+  return { x: x * scale, y: -y * scale }; // invert y to have heart upright
 }
 
-/* -------------------------
-   CLIPBOARD + CLICK SOUND
-   ------------------------- */
-function playCuteChime(){
+// convert heart coords to canvas coords
+function toCanvas(pt){
+  const cx = innerWidth * 0.35; // shift heart to left-of-center (visual area)
+  const cy = innerHeight * 0.45;
+  return { x: cx + pt.x, y: cy + pt.y };
+}
+
+// particles container
+let particles = [];
+let traces = [];
+let running = false;
+let startTime = 0;
+let duration = 4200; // ms for full heart emission
+let totalPoints = 320; // resolution of heart
+let emissionDone = false;
+
+// Utility random
+function rand(a,b){ return a + Math.random()*(b-a); }
+
+// create initial heart sample points scaled to viewport
+function buildHeartSamples(){
+  const size = Math.min(innerWidth, innerHeight) * 0.035; // scale factor
+  const samples = [];
+  for(let i=0;i<totalPoints;i++){
+    const t = i/totalPoints * Math.PI * 2;
+    const p = heartPoint(t, size);
+    samples.push(toCanvas(p));
+  }
+  return samples;
+}
+
+let heartSamples = buildHeartSamples();
+window.addEventListener('resize', ()=> { heartSamples = buildHeartSamples(); });
+
+// particle emitter: spawn small glowing dots that move outward a bit and fade
+function spawnAt(x,y){
+  const hue = 270 + Math.random()*50; // purple-ish to cyan
+  const p = {
+    x, y,
+    vx: rand(-1.4,1.4),
+    vy: rand(-1.6,-0.2),
+    life: 600 + Math.random()*600,
+    born: performance.now(),
+    size: 1 + Math.random()*3,
+    hue
+  };
+  particles.push(p);
+  // also store a tiny trace for trail
+  traces.push({ x, y, a:1, life: 380 + Math.random()*300 });
+}
+
+// draw loop
+function render(now){
+  if(!running) return;
+  const t = now - startTime;
+  // clear with slight alpha to create trails
+  ctx.clearRect(0,0,innerWidth, innerHeight);
+  // subtle global tint to increase glow
+  ctx.fillStyle = 'rgba(0,0,0,0.14)';
+  ctx.fillRect(0,0,innerWidth,innerHeight);
+
+  // emission progress
+  const progress = Math.min(1, t / duration);
+
+  // spawn along heart proportionally to progress
+  const emitCount = Math.floor(progress * heartSamples.length);
+  for(let i=0;i<emitCount;i++){
+    // bias a bit to create random sparkles
+    if(Math.random() < 0.6){
+      const s = heartSamples[i];
+      // jitter slightly
+      spawnAt(s.x + rand(-6,6), s.y + rand(-6,6));
+    }
+  }
+
+  // update particles
+  for(let i = particles.length -1; i>=0; i--){
+    const p = particles[i];
+    const age = now - p.born;
+    if(age > p.life){
+      particles.splice(i,1);
+      continue;
+    }
+    // physics
+    p.vy += 0.02; // gravity tiny
+    p.x += p.vx;
+    p.y += p.vy;
+    const lifeRatio = 1 - (age / p.life);
+
+    // glow draw
+    ctx.beginPath();
+    const gsize = p.size * (1.6 + (1-lifeRatio)*2.5);
+    ctx.fillStyle = `hsla(${p.hue},85%,65%,${0.28 * lifeRatio})`;
+    ctx.shadowColor = `hsla(${p.hue},85%,65%,${0.95 * lifeRatio})`;
+    ctx.shadowBlur = 22 * lifeRatio;
+    ctx.arc(p.x, p.y, gsize, 0, Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // draw traces (soft)
+  for(let j = traces.length-1;j>=0;j--){
+    const tr = traces[j];
+    tr.life -= 16;
+    tr.a = Math.max(0, tr.life / 520);
+    if(tr.life <= 0) traces.splice(j,1);
+    else {
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255,255,255,${0.02 * tr.a})`;
+      ctx.arc(tr.x, tr.y, 6 * tr.a, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  // after full emission and particles quieted, finish
+  if(progress >= 1 && particles.length === 0){
+    // finish once
+    running = false;
+    showFinal();
+  } else {
+    requestAnimationFrame(render);
+  }
+}
+
+// start the animation
+function startAnim(){
+  // reset
+  particles = [];
+  traces = [];
+  running = true;
+  startTime = performance.now();
+  emissionDone = false;
+  // small initial burst center
+  const center = { x: innerWidth*0.5, y: innerHeight*0.35 };
+  for(let i=0;i<12;i++){
+    spawnAt(center.x + rand(-6,6), center.y + rand(-6,6));
+  }
+  // animate for duration + safety margin
+  requestAnimationFrame(render);
+}
+
+// show final overlay
+const finalBox = document.getElementById('finalBox');
+const finalTitle = document.getElementById('finalTitle');
+const finalSub = document.getElementById('finalSub');
+const finalLinks = document.getElementById('finalLinks');
+
+function showFinal(){
+  // soft chime
+  playChime();
+
+  // make visible
+  finalBox.parentElement.setAttribute('aria-hidden','false');
+  // add class after tiny delay to allow repaint
+  setTimeout(()=> {
+    finalBox.classList.add('show');
+    finalBox.parentElement.style.pointerEvents = 'auto';
+    finalBox.style.pointerEvents = 'auto';
+    finalBox.classList.add('show'); // visual
+    document.querySelector('.centerBox').classList.add('show');
+    // toggle classes manually: we use class on parent to trigger CSS
+    document.querySelector('.centerBox').classList.add('show'); 
+    // also add .show on inner element by toggling its style
+    finalTitle.style.opacity = 1;
+    // use container to toggle visible
+    document.querySelector('.centerBox').classList.add('show');
+    document.getElementById('finalTitle').style.opacity = 1;
+    // add class to body for CSS
+    document.body.classList.add('hasFinal');
+  }, 40);
+
+  // fade in via CSS: we toggle .show on wrapper
+  setTimeout(()=>{
+    document.querySelector('.centerBox').classList.add('show');
+    // expose links
+    finalLinks.style.opacity = 1;
+  }, 180);
+}
+
+// soft chime using WebAudio
+function playChime(){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const now = ctx.currentTime;
-
-    // short pluck
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(740, now);
-    g.gain.setValueAtTime(0.0001, now);
-    g.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-    o.connect(g);
-    g.connect(ctx.destination);
-    o.start(now);
-    o.stop(now + 0.46);
-
-    // small bell above
-    const o2 = ctx.createOscillator();
-    const g2 = ctx.createGain();
-    o2.type = 'triangle';
-    o2.frequency.setValueAtTime(1180, now + 0.02);
-    g2.gain.setValueAtTime(0.0001, now + 0.02);
-    g2.gain.exponentialRampToValueAtTime(0.08, now + 0.04);
-    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
-    // subtle low-pass for sweetness
-    const bi = ctx.createBiquadFilter();
-    bi.type = 'lowpass';
-    bi.frequency.setValueAtTime(2400, now);
-    o2.connect(g2);
-    g2.connect(bi);
-    bi.connect(ctx.destination);
-    o2.start(now + 0.02);
-    o2.stop(now + 0.62);
+    // bell-ish chord
+    const freqs = [560, 820, 1040];
+    freqs.forEach((f,i)=>{
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(f, now + 0.02*i);
+      g.gain.setValueAtTime(0.0001, now + 0.02*i);
+      g.gain.exponentialRampToValueAtTime(0.10 - i*0.02, now + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.9 + i*0.06);
+      const bf = ctx.createBiquadFilter();
+      bf.type = 'lowpass';
+      bf.frequency.setValueAtTime(2600 - i*200, now);
+      o.connect(g); g.connect(bf); bf.connect(ctx.destination);
+      o.start(now + 0.02*i); o.stop(now + 1.0 + i*0.06);
+    });
   }catch(e){
-    // ignore if not allowed
-    console.warn('audio error', e);
+    console.warn('Audio error:', e);
   }
 }
 
-copyBtn.addEventListener('click', async (ev)=>{
-  const rect = copyBtn.getBoundingClientRect();
-  const x = rect.left + rect.width/2 - particlesRoot.getBoundingClientRect().left;
-  const y = rect.top + rect.height/2 - particlesRoot.getBoundingClientRect().top;
-
-  // spawn particles
-  makeBurst(x, y);
-
-  // play sound
-  playCuteChime();
-
-  // copy IP
+// copy IP handler
+document.getElementById('copyIP').addEventListener('click', async ()=>{
   const ip = 'DirtMc.pro:21411';
   try{
     await navigator.clipboard.writeText(ip);
-    // small visual feedback
-    copyBtn.innerText = 'Copied!';
-    setTimeout(()=> copyBtn.innerText = 'Copy IP', 1200);
-  }catch(err){
-    // fallback prompt
-    prompt('Copy server IP:', ip);
+    document.getElementById('copyIP').innerText = 'Copied ✓';
+    setTimeout(()=> document.getElementById('copyIP').innerText = 'Copy IP', 1400);
+  }catch(e){
+    prompt('Copy this IP:', ip);
   }
 });
 
-/* click on join - small effect + sound */
-joinBtn.addEventListener('click', (ev)=>{
-  // compute center of button
-  const rect = joinBtn.getBoundingClientRect();
-  const x = rect.left + rect.width/2 - particlesRoot.getBoundingClientRect().left;
-  const y = rect.top + rect.height/2 - particlesRoot.getBoundingClientRect().top;
-  makeBurst(x, y);
-  playCuteChime();
-  // allow link to open normally
+// replay button
+document.getElementById('replay').addEventListener('click', ()=>{
+  // hide final
+  document.querySelector('.centerBox').classList.remove('show');
+  finalBox.style.pointerEvents = 'none';
+  document.body.classList.remove('hasFinal');
+  // small delay then restart
+  setTimeout(()=> {
+    startAnim();
+  }, 260);
 });
 
-/* support clicking anywhere on card to spawn little spark */
-document.querySelector('.card').addEventListener('click', (ev)=>{
-  // ignore clicks on the buttons (they already handle)
-  if (ev.target.closest('.btn')) return;
-  const rootRect = particlesRoot.getBoundingClientRect();
-  const x = ev.clientX - rootRect.left;
-  const y = ev.clientY - rootRect.top;
-  makeBurst(x, y);
-  // quieter chime
-  setTimeout(()=> playCuteChime(), 10);
-});
-
-/* make sure particle container covers left visual area */
-(function ensureParticlesLayer(){
-  // fix size on resize (particles layer absolute positioning inside visual)
-  const resize = ()=> {
-    const vis = document.querySelector('.visual');
-    const pr = particlesRoot.parentElement;
-    // nothing to do — particles positioned relative to .visual area by using its local coords
-  };
-  window.addEventListener('resize', resize);
-})();
+// start immediately
+startAnim();
 
 </script>
 </body>
