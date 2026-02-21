@@ -105,6 +105,7 @@ button:hover{
 
 /* Hide */
 .hidden{display:none;}
+
 </style>
 </head>
 <body>
@@ -124,14 +125,6 @@ button:hover{
 <p id="msg"></p>
 </div>
 
-<!-- 2FA -->
-<div class="card hidden" id="codeBox">
-<h2>Enter 2FA Code</h2>
-<input type="text" id="codeInput" placeholder="Code">
-<button onclick="verifyCode()">Verify</button>
-<p id="codeMsg"></p>
-</div>
-
 <!-- MAIN -->
 <div class="mainScreen" id="mainScreen">
 <h1>DirtMc</h1>
@@ -140,12 +133,10 @@ button:hover{
 
 <script>
 
-let generatedCode = null;
-
 /* ===== REGISTER ===== */
 function register(){
- let email = emailInput().value;
- let pass = passInput().value;
+ let email = document.getElementById("email").value;
+ let pass = document.getElementById("pass").value;
 
  if(!email || !pass){
   showMsg("Fill fields");
@@ -155,43 +146,22 @@ function register(){
  localStorage.setItem("archive_email", email);
  localStorage.setItem("archive_pass", pass);
 
- sendCode(email);
+ showMsg("Registered Successfully");
 }
 
 /* ===== LOGIN ===== */
 function login(){
- let email = emailInput().value;
- let pass = passInput().value;
+ let email = document.getElementById("email").value;
+ let pass = document.getElementById("pass").value;
 
  let savedEmail = localStorage.getItem("archive_email");
  let savedPass = localStorage.getItem("archive_pass");
 
  if(email === savedEmail && pass === savedPass){
-   sendCode(email);
- }else{
-   showMsg("Wrong account");
- }
-}
-
-/* ===== 2FA CODE ===== */
-function sendCode(email){
- generatedCode = Math.floor(100000 + Math.random()*900000);
-
- alert("Your 2FA Code (Demo): " + generatedCode);
-
- document.getElementById("authBox").classList.add("hidden");
- document.getElementById("codeBox").classList.remove("hidden");
-}
-
-/* Verify */
-function verifyCode(){
- let inputCode = document.getElementById("codeInput").value;
-
- if(inputCode == generatedCode){
-   document.getElementById("codeBox").classList.add("hidden");
+   document.getElementById("authBox").classList.add("hidden");
    document.getElementById("mainScreen").style.display="flex";
  }else{
-   document.getElementById("codeMsg").innerText="Invalid Code";
+   showMsg("Wrong account");
  }
 }
 
@@ -207,10 +177,10 @@ function toggleTheme(){
  }
 }
 
-/* Helpers */
-function emailInput(){ return document.getElementById("email"); }
-function passInput(){ return document.getElementById("pass"); }
-function showMsg(m){ document.getElementById("msg").innerText=m; }
+/* Helper */
+function showMsg(m){
+ document.getElementById("msg").innerText = m;
+}
 
 </script>
 
