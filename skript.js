@@ -12,52 +12,43 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-// تهيئة EmailJS
 emailjs.init("oqV7lpJJmCVgAnrx6");
 
 let generatedCode = null;
 
-// حركة التنقل بين واجهة الدخول والتسجيل
+// نظام الثيمات
+window.setTheme = function(theme) {
+    document.body.className = 'theme-' + theme;
+    toggleSidebar();
+};
+
+window.toggleSidebar = function() {
+    document.getElementById('sidebar').classList.toggle('active');
+};
+
 window.showBox = function(id) {
-    document.querySelectorAll('.auth-container').forEach(c => c.classList.add('hidden'));
-    const targetBox = document.getElementById(id);
-    targetBox.classList.remove('hidden');
-    targetBox.classList.add('fade-in');
+    document.getElementById('registerBox').classList.add('hidden');
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById(id).classList.remove('hidden');
 };
 
 window.handleAuth = async function(type) {
+    const btn = (type === 'register') ? document.getElementById('regBtn') : document.getElementById('loginBtn');
     const user = (type === 'register') ? document.getElementById('regUser').value : document.getElementById('loginUser').value;
     const pass = (type === 'register') ? document.getElementById('regPass').value : document.getElementById('loginPass').value;
-    const btn = (type === 'register') ? document.getElementById('regBtn') : document.getElementById('loginBtn');
     let email = "";
 
-    if (!user || !pass) return alert("System requires full credentials.");
+    if (!user || !pass) return alert("Fill all fields");
     
-    // تأثير الزر أثناء المعالجة
+    btn.innerText = "AUTHENTICATING...";
     btn.disabled = true;
-    btn.innerText = "PROCESSING...";
 
     if (type === 'register') {
         email = document.getElementById('regEmail').value;
-        if (!email) { btn.disabled = false; btn.innerText = "GET ACCESS CODE"; return alert("Email Required."); }
     } else {
-        try {
-            const userRef = doc(db, "users", user);
-            const snap = await getDoc(userRef);
-            if (snap.exists() && snap.data().password === pass) {
-                email = snap.data().email;
-            } else {
-                alert("Access Denied: Invalid Credentials.");
-                btn.disabled = false; btn.innerText = "REQUEST 2FA";
-                return;
-            }
-        } catch(e) { 
-            alert("Database Offline."); 
-            btn.disabled = false; 
-            btn.innerText = "REQUEST 2FA";
-            return; 
-        }
+        const snap = await getDoc(doc(db, "users", user));
+        if (snap.exists() && snap.data().password === pass) email = snap.data().email;
+        else { alert("Wrong Access"); btn.disabled = false; return; }
     }
 
     generatedCode = Math.floor(1000 + Math.random() * 9000);
@@ -66,23 +57,9 @@ window.handleAuth = async function(type) {
         to_email: email,
         verification_code: generatedCode
     }).then(() => {
-        // الأنيميشن وتغيير الزر بعد نجاح الإرسال
-        btn.innerText = "DONE! ✅"; 
-        btn.style.background = "transparent";
-        btn.style.border = "2px solid #00ff66";
-        btn.style.color = "#00ff66";
-        btn.style.boxShadow = "none";
-        
-        // إظهار حقل الـ 2FA بحركة Slide Down
-        if (type === 'register') {
-            document.getElementById('regVerify').classList.remove('hidden');
-        } else {
-            document.getElementById('login2FA').classList.remove('hidden');
-        }
-    }).catch((err) => {
-        alert("Communication Error.");
-        btn.disabled = false;
-        btn.innerText = "RETRY";
+        btn.innerText = "DONE! ✅";
+        if (type === 'register') document.getElementById('regVerify').classList.remove('hidden');
+        else document.getElementById('login2FA').classList.remove('hidden');
     });
 };
 
@@ -90,23 +67,15 @@ window.completeRegister = async function() {
     const user = document.getElementById('regUser').value;
     const pass = document.getElementById('regPass').value;
     const email = document.getElementById('regEmail').value;
-    
     if (document.getElementById('regCodeInput').value == generatedCode) {
         await setDoc(doc(db, "users", user), { username: user, password: pass, email: email });
-        alert("Archive Created Successfully!");
         showBox('loginBox');
-    } else {
-        alert("Invalid 2FA Code.");
     }
 };
 
 window.completeLogin = function() {
     if (document.getElementById('loginCodeInput').value == generatedCode) {
-        document.getElementById('loginBox').classList.add('hidden');
-        const dirtScreen = document.getElementById('dirtScreen');
-        dirtScreen.classList.remove('hidden');
-        dirtScreen.style.display = 'flex';
-    } else {
-        alert("Unauthorized Access Code.");
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('dirtScreen').classList.remove('hidden');
     }
 };
