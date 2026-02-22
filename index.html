@@ -1,56 +1,75 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DirtMc | Premium Archive</title>
-    
+    <title>DirtMc | Ultra Premium</title>
     <link rel="stylesheet" href="style.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
-<body>
+<body class="theme-night">
+
+    <div class="menu-btn" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-content">
+            <h3>THEMES</h3>
+            <div class="theme-option" onclick="setTheme('night')">
+                <span>Night</span> <i class="fas fa-moon"></i>
+            </div>
+            <div class="theme-option" onclick="setTheme('sun')">
+                <span>Sun</span> <i class="fas fa-sun"></i>
+            </div>
+            <div class="theme-option" onclick="setTheme('both')">
+                <span>Both</span> <i class="fas fa-adjust"></i>
+            </div>
+        </div>
+    </div>
 
     <div id="registerBox" class="auth-container fade-in">
-        <h2>REGISTER</h2>
+        <div class="logo-area">DIRT</div>
+        <h2>ARCHIVE ACCESS</h2>
         <input type="text" id="regUser" placeholder="USERNAME">
         <input type="email" id="regEmail" placeholder="EMAIL ADDRESS">
         <input type="password" id="regPass" placeholder="PASSWORD">
         
-        <button class="btn effect-btn" id="regBtn" onclick="handleAuth('register')">GET ACCESS CODE</button>
+        <button class="btn main-btn" id="regBtn" onclick="handleAuth('register')">SEND ACCESS CODE</button>
         
         <div id="regVerify" class="hidden slide-down">
-            <p class="check-email-txt">📩 CHECK YOUR EMAIL</p>
-            <input type="text" id="regCodeInput" placeholder="4-DIGIT CODE" class="code-input">
-            <button class="btn effect-btn done-btn" onclick="completeRegister()">AUTHORIZE</button>
+            <p class="status-info">CHECK YOUR EMAIL</p>
+            <input type="text" id="regCodeInput" placeholder="2FA CODE" class="code-field">
+            <button class="btn done-btn" onclick="completeRegister()">DONE</button>
         </div>
-        
-        <span class="switch-link" onclick="showBox('loginBox')">ALREADY ARCHIVED? SIGN IN</span>
+        <p class="switch-txt" onclick="showBox('loginBox')">Already have an account? Login</p>
     </div>
 
     <div id="loginBox" class="auth-container hidden">
-        <h2>LOGIN</h2>
+        <div class="logo-area">DIRT</div>
+        <h2>WELCOME BACK</h2>
         <input type="text" id="loginUser" placeholder="USERNAME">
         <input type="password" id="loginPass" placeholder="PASSWORD">
         
-        <button class="btn effect-btn" id="loginBtn" onclick="handleAuth('login')">REQUEST 2FA</button>
+        <button class="btn main-btn" id="loginBtn" onclick="handleAuth('login')">REQUEST LOGIN</button>
         
         <div id="login2FA" class="hidden slide-down">
-            <p class="check-email-txt">📩 CHECK YOUR EMAIL</p>
-            <input type="text" id="loginCodeInput" placeholder="2FA CODE" class="code-input">
-            <button class="btn effect-btn done-btn" onclick="completeLogin()">AUTHORIZE</button>
+            <p class="status-info">CHECK YOUR EMAIL</p>
+            <input type="text" id="loginCodeInput" placeholder="2FA CODE" class="code-field">
+            <button class="btn done-btn" onclick="completeLogin()">DONE</button>
         </div>
-        
-        <span class="switch-link" onclick="showBox('registerBox')">NEW PLAYER? CREATE ARCHIVE</span>
+        <p class="switch-txt" onclick="showBox('registerBox')">New player? Register</p>
     </div>
 
-    <div id="dirtScreen" class="hidden fade-in">
-        <h1 id="dirtText">DIRT</h1>
-        <div class="server-info">
-            <div class="ip-box">IP: <span>dirtmc.pro:21411</span></div>
-            <a href="https://discord.gg/dirtmc" target="_blank" class="btn effect-btn discord-btn">JOIN DISCORD</a>
+    <div id="dirtScreen" class="hidden cinematic-fade">
+        <h1 class="glow-text">DIRT</h1>
+        <div class="server-card">
+            <p class="ip-display">dirtmc.pro 21411</p>
+            <a href="https://discord.gg/dirtmc" target="_blank" class="discord-link">
+                <i class="fab fa-discord"></i> discord
+            </a>
         </div>
-        <button class="btn logout-btn" onclick="location.reload()">TERMINATE SESSION</button>
     </div>
 
     <script type="module" src="script.js"></script>
