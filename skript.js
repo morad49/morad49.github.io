@@ -1,99 +1,152 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
+const D_KEY='dirt_accounts_v1';
+const LOG_KEY='dirt_logged_in';
 
-// إعدادات Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyB7oGrcD1ShriCYTP_0_vMPdPkkmd2GfwU",
-    authDomain: "dirtmc-7c068.firebaseapp.com",
-    projectId: "dirtmc-7c068",
-    storageBucket: "dirtmc-7c068.firebasestorage.app",
-    messagingSenderId: "808909665625",
-    appId: "1:808909665625:web:0aa7aaad9c31dc0e0d4848"
+function loadAccounts(){
+  return JSON.parse(localStorage.getItem(D_KEY)||'{}');
+}
+
+function saveAccounts(obj){
+  localStorage.setItem(D_KEY,JSON.stringify(obj));
+}
+
+async function sha256(str){
+  const buf=new TextEncoder().encode(str);
+  const hash=await crypto.subtle.digest('SHA-256',buf);
+  return Array.from(new Uint8Array(hash))
+    .map(b=>b.toString(16).padStart(2,'0'))
+    .join('');
+}
+
+function setLogged(email,remember){
+  if(remember) localStorage.setItem(LOG_KEY,email);
+  else sessionStorage.setItem(LOG_KEY,email);
+}
+
+function getLogged(){
+  return localStorage.getItem(LOG_KEY) ||
+         sessionStorage.getItem(LOG_KEY);
+}
+
+function clearLogged(){
+  localStorage.removeItem(LOG_KEY);
+  sessionStorage.removeItem(LOG_KEY);
+}
+
+function updateUI(){
+  const user=getLogged();
+  document.getElementById('welcomeText').textContent =
+    user ? user : 'مرحبا — زائر';
+}
+
+document.getElementById('openRegister').onclick =
+  ()=>authModal.style.display='flex';
+
+document.getElementById('gotoLogin').onclick = ()=>{
+  registerBox.style.display='none';
+  loginBox.style.display='block';
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// تأكد من صحة هذه المفاتيح من EmailJS Dashboard
-const SERVICE_ID = "Service_nd6soio"; 
-const TEMPLATE_ID = "template_f837clr";
-const PUBLIC_KEY = "oqV7lpJJmCVgAnrx6";
-
-emailjs.init(PUBLIC_KEY);
-
-let generatedCode = null;
-
-// ربط الدوال بالـ Window ليراها ملف الـ HTML
-window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('active');
-
-window.setTheme = (theme) => {
-    document.body.className = 'theme-' + theme;
-    window.toggleSidebar();
+document.getElementById('gotoRegister').onclick = ()=>{
+  loginBox.style.display='none';
+  registerBox.style.display='block';
 };
 
-window.showBox = (id) => {
-    document.getElementById('registerBox').classList.add('hidden');
-    document.getElementById('loginBox').classList.add('hidden');
-    document.getElementById(id).classList.remove('hidden');
+document.getElementById('logoutBtn').onclick = ()=>{
+  clearLogged();
+  updateUI();
 };
 
-window.handleAuth = async (type) => {
-    const btn = document.getElementById(type === 'register' ? 'regBtn' : 'loginBtn');
-    const user = document.getElementById(type === 'register' ? 'regUser' : 'loginUser').value;
-    const pass = document.getElementById(type === 'register' ? 'regPass' : 'loginPass').value;
-    let email = "";
+document.getElementById('openBackup').onclick =
+  ()=>backupModal.style.display='flex';
 
-    if (!user || !pass) return alert("All fields are required.");
+document.getElementById('closeBackup').onclick =
+  ()=>backupModal.style.display='none';
 
-    btn.innerText = "VERIFYING...";
-    btn.disabled = true;
+document.getElementById('doRegister').onclick = async ()=>{
+  const email=regEmail.value.trim().toLowerCase();
+  const pass=regPass.value;
+  const user=regUser.value;
 
-    if (type === 'register') {
-        email = document.getElementById('regEmail').value;
-        if(!email) { btn.disabled = false; btn.innerText="GET ACCESS CODE"; return alert("Email missing"); }
-    } else {
-        const snap = await getDoc(doc(db, "users", user));
-        if (snap.exists() && snap.data().password === pass) {
-            email = snap.data().email;
-        } else {
-            alert("Credentials Error."); btn.disabled = false; btn.innerText="RETRY"; return;
-        }
-    }
+  if(!email||!pass) return alert('Fill fields');
 
-    generatedCode = Math.floor(1000 + Math.random() * 9000);
+  const accs=loadAccounts();
+  if(accs[email]) return alert('Account exists');
 
-    // عملية الإرسال
-    emailjs.send(SERVICE_ID, TEMPLATE_ID, {
-        to_email: email,
-        verification_code: generatedCode
-    }).then(() => {
-        btn.innerText = "SENT! ✅";
-        document.getElementById(type === 'register' ? 'regVerify' : 'login2FA').classList.remove('hidden');
-    }).catch((err) => {
-        console.error("EmailJS Error:", err);
-        alert("ERROR: Check your Service ID or Template ID in script.js");
-        btn.disabled = false;
-        btn.innerText = "RETRY";
-    });
+  accs[email]={
+    passwordHash:await sha256(pass),
+    username:user
+  };
+
+  saveAccounts(accs);
+  setLogged(email,remember.checked);
+  updateUI();
+  authModal.style.display='none';
 };
 
-window.completeRegister = async () => {
-    const user = document.getElementById('regUser').value;
-    const pass = document.getElementById('regPass').value;
-    const email = document.getElementById('regEmail').value;
-    const inputCode = document.getElementById('regCodeInput').value;
-    
-    if (inputCode == generatedCode) {
-        await setDoc(doc(db, "users", user), { username: user, password: pass, email: email });
-        alert("Registered! Now Login.");
-        window.showBox('loginBox');
-    } else alert("Code Mismatch.");
+document.getElementById('doLogin').onclick = async ()=>{
+  const email=loginEmail.value.trim().toLowerCase();
+  const pass=loginPass.value;
+
+  const accs=loadAccounts();
+  if(!accs[email]) return alert('No account');
+
+  if(await sha256(pass)!==accs[email].passwordHash)
+    return alert('Wrong password');
+
+  setLogged(email,rememberLogin.checked);
+  updateUI();
+  authModal.style.display='none';
 };
 
-window.completeLogin = () => {
-    const inputCode = document.getElementById('loginCodeInput').value;
-    if (inputCode == generatedCode) {
-        document.getElementById('loginBox').classList.add('hidden');
-        document.getElementById('dirtScreen').style.display = 'flex';
-    } else alert("Unauthorized Code.");
+document.getElementById('doExport').onclick = ()=>{
+  const email=getLogged();
+  if(!email) return alert('Login first');
+
+  backupOut.value =
+    btoa(JSON.stringify(loadAccounts()[email]));
 };
+
+document.getElementById('doImport').onclick = ()=>{
+  try{
+    const data=
+      JSON.parse(atob(backupIn.value));
+
+    const email=prompt('Enter email');
+    const accs=loadAccounts();
+    accs[email]=data;
+    saveAccounts(accs);
+    alert('Imported');
+  }catch{
+    alert('Invalid backup');
+  }
+};
+
+hamburger.onclick =
+  ()=>themeMenu.classList.toggle('show');
+
+document.querySelectorAll('.opt')
+.forEach(el=>{
+  el.onclick=()=>{
+    const t=el.dataset.theme;
+
+    document.body.classList.remove(
+      'theme-night','theme-sun'
+    );
+
+    splitWrap.style.display='none';
+
+    if(t==='night')
+      document.body.classList.add('theme-night');
+
+    if(t==='sun')
+      document.body.classList.add('theme-sun');
+
+    if(t==='both')
+      splitWrap.style.display='block';
+  };
+});
+
+discordLink.onclick =
+  ()=>window.open('https://discord.gg/dirtmc','_blank');
+
+updateUI();
