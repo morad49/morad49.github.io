@@ -1,149 +1,58 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DirtMc | Final Fix</title>
+    <title>DirtMc | Global Archive</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <style>
-        :root { --bg: #030508; --accent: #00ff66; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1); }
-        body { margin: 0; background-color: var(--bg); color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; box-sizing: border-box; background-image: radial-gradient(circle at center, #0a1f0e 0%, #030508 100%); }
-        .auth-container { position: relative; background: var(--glass); backdrop-filter: blur(20px); padding: 40px 25px; border-radius: 24px; border: 1px solid var(--border); width: 100%; max-width: 450px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.6); }
-        .auth-container::before { content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60%; height: 4px; background: var(--accent); box-shadow: 0 0 20px var(--accent); border-radius: 0 0 15px 15px; }
-        h2 { font-size: 28px; letter-spacing: 4px; margin-bottom: 30px; color: var(--accent); }
-        input { width: 100%; padding: 16px; margin: 12px 0; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-size: 16px; outline: none; box-sizing: border-box; text-align: center; }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 102, 0.2); }
-        .btn { width: 100%; padding: 16px; background: var(--accent); border: none; color: #000; font-weight: 800; border-radius: 12px; cursor: pointer; margin-top: 15px; font-size: 16px; text-transform: uppercase; transition: 0.3s; }
-        .btn:hover { filter: brightness(1.2); box-shadow: 0 0 25px rgba(0, 255, 102, 0.4); }
-        .status-msg { display: none; color: var(--accent); background: rgba(0, 255, 102, 0.1); padding: 12px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--accent); font-weight: bold; }
-        #dirtScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 999; }
-        #dirtText { font-size: clamp(60px, 18vw, 130px); font-weight: 900; text-shadow: 0 0 40px var(--accent); }
-        .switch-link { margin-top: 25px; display: block; color: #888; cursor: pointer; font-size: 14px; }
-        .hidden { display: none !important; }
-    </style>
 </head>
 <body>
 
-    <div id="registerBox" class="auth-container">
-        <div id="regStatus" class="status-msg">✅ CODE SENT TO EMAIL</div>
+    <div id="registerBox" class="auth-container fade-in">
         <h2>REGISTER</h2>
         <input type="text" id="regUser" placeholder="USERNAME">
         <input type="email" id="regEmail" placeholder="EMAIL ADDRESS">
         <input type="password" id="regPass" placeholder="PASSWORD">
-        <button class="btn" id="regBtn" onclick="handleAuth('register')">SEND ACCESS CODE</button>
-        <div id="regVerify" class="hidden">
-            <input type="text" id="regCodeInput" placeholder="4-DIGIT CODE" style="margin-top:20px;">
-            <button class="btn" onclick="completeRegister()">CREATE ARCHIVE</button>
+        
+        <button class="btn effect-btn" id="regBtn" onclick="handleAuth('register')">GET ACCESS CODE</button>
+        
+        <div id="regVerify" class="hidden slide-down">
+            <p class="check-email-txt">📩 CHECK YOUR EMAIL</p>
+            <input type="text" id="regCodeInput" placeholder="2FA CODE" class="code-input">
+            <button class="btn effect-btn done-btn" onclick="completeRegister()">DONE</button>
         </div>
-        <span class="switch-link" onclick="showBox('loginBox')">ALREADY HAVE AN ACCOUNT? LOGIN</span>
+        
+        <span class="switch-link" onclick="showBox('loginBox')">ALREADY ARCHIVED? LOGIN</span>
     </div>
 
     <div id="loginBox" class="auth-container hidden">
-        <div id="loginStatus" class="status-msg">✅ 2FA CODE SENT</div>
         <h2>LOGIN</h2>
         <input type="text" id="loginUser" placeholder="USERNAME">
         <input type="password" id="loginPass" placeholder="PASSWORD">
-        <button class="btn" id="loginBtn" onclick="handleAuth('login')">REQUEST 2FA</button>
-        <div id="login2FA" class="hidden">
-            <input type="text" id="loginCodeInput" placeholder="2FA CODE" style="margin-top:20px;">
-            <button class="btn" onclick="completeLogin()">AUTHORIZE</button>
+        
+        <button class="btn effect-btn" id="loginBtn" onclick="handleAuth('login')">LOGIN</button>
+        
+        <div id="login2FA" class="hidden slide-down">
+            <p class="check-email-txt">📩 CHECK YOUR EMAIL</p>
+            <input type="text" id="loginCodeInput" placeholder="2FA CODE" class="code-input">
+            <button class="btn effect-btn done-btn" onclick="completeLogin()">DONE</button>
         </div>
+        
         <span class="switch-link" onclick="showBox('registerBox')">NEW PLAYER? REGISTER</span>
     </div>
 
-    <div id="dirtScreen">
-        <h1 id="dirtText">DIRT</h1>
-        <button class="btn" style="width: auto; padding: 10px 50px; margin-top: 40px; background: #111; color:#fff;" onclick="location.reload()">LOGOUT</button>
+    <div id="dirtScreen" class="hidden fade-in">
+        <h1 id="dirtText">DIRT MC</h1>
+        <div class="server-info">
+            <p class="ip-address">IP: <span>dirtmc.pro:21411</span></p>
+            <a href="https://discord.gg/dirtmc" target="_blank" class="discord-btn">JOIN DISCORD</a>
+        </div>
+        <button class="btn effect-btn logout-btn" onclick="location.reload()">LOGOUT</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyB7oGrcD1ShriCYTP_0_vMPdPkkmd2GfwU",
-            authDomain: "dirtmc-7c068.firebaseapp.com",
-            projectId: "dirtmc-7c068",
-            storageBucket: "dirtmc-7c068.firebasestorage.app",
-            messagingSenderId: "808909665625",
-            appId: "1:808909665625:web:0aa7aaad9c31dc0e0d4848"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        window.fBase = { db, doc, setDoc, getDoc };
-    </script>
-
-    <script>
-        // تحديث الـ Public Key ليكون بالضبط كما أرسلته
-        (function() { emailjs.init("oqV7lpJJmCVgAnrx6"); })();
-
-        let generatedCode = null;
-
-        function showBox(id) {
-            document.querySelectorAll('.auth-container').forEach(c => c.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        async function handleAuth(type) {
-            const user = (type === 'register') ? document.getElementById('regUser').value : document.getElementById('loginUser').value;
-            const pass = (type === 'register') ? document.getElementById('regPass').value : document.getElementById('loginPass').value;
-            const btn = (type === 'register') ? document.getElementById('regBtn') : document.getElementById('loginBtn');
-            const status = (type === 'register') ? document.getElementById('regStatus') : document.getElementById('loginStatus');
-            let email = "";
-
-            if (!user || !pass) return alert("Missing fields.");
-            btn.disabled = true;
-            btn.innerText = "PROCESSING...";
-
-            if (type === 'register') {
-                email = document.getElementById('regEmail').value;
-            } else {
-                try {
-                    const userRef = window.fBase.doc(window.fBase.db, "users", user);
-                    const snap = await window.fBase.getDoc(userRef);
-                    if (snap.exists() && snap.data().password === pass) {
-                        email = snap.data().email;
-                    } else {
-                        alert("Wrong credentials.");
-                        btn.disabled = false; btn.innerText = "RETRY";
-                        return;
-                    }
-                } catch(e) { alert("Database error."); btn.disabled = false; return; }
-            }
-
-            generatedCode = Math.floor(1000 + Math.random() * 9000);
-
-            // تحديث الـ Service ID والـ Template ID بالضبط كما أرسلتها
-            emailjs.send("Service_nd6soio", "template_f837clr", {
-                to_email: email,
-                verification_code: generatedCode
-            }).then(() => {
-                status.style.display = 'block';
-                btn.innerText = "SENT ✅";
-                if (type === 'register') document.getElementById('regVerify').classList.remove('hidden');
-                else document.getElementById('login2FA').classList.remove('hidden');
-            }).catch((err) => {
-                alert("Error: " + JSON.stringify(err));
-                btn.disabled = false;
-                btn.innerText = "RETRY";
-            });
-        }
-
-        async function completeRegister() {
-            const user = document.getElementById('regUser').value;
-            const pass = document.getElementById('regPass').value;
-            const email = document.getElementById('regEmail').value;
-            if (document.getElementById('regCodeInput').value == generatedCode) {
-                await window.fBase.setDoc(window.fBase.doc(window.fBase.db, "users", user), { username: user, password: pass, email: email });
-                alert("Archive Created!");
-                showBox('loginBox');
-            } else alert("Wrong code.");
-        }
-
-        function completeLogin() {
-            if (document.getElementById('loginCodeInput').value == generatedCode) {
-                document.getElementById('dirtScreen').style.display = 'flex';
-            } else alert("Wrong code.");
-        }
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
