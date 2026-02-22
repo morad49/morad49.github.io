@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DirtMc | Global Archive</title>
+    <title>DirtMc | Premium Archive</title>
     
     <link rel="stylesheet" href="style.css">
     
@@ -21,11 +21,11 @@
         
         <div id="regVerify" class="hidden slide-down">
             <p class="check-email-txt">📩 CHECK YOUR EMAIL</p>
-            <input type="text" id="regCodeInput" placeholder="2FA CODE" class="code-input">
-            <button class="btn effect-btn done-btn" onclick="completeRegister()">DONE</button>
+            <input type="text" id="regCodeInput" placeholder="4-DIGIT CODE" class="code-input">
+            <button class="btn effect-btn done-btn" onclick="completeRegister()">AUTHORIZE</button>
         </div>
         
-        <span class="switch-link" onclick="showBox('loginBox')">ALREADY ARCHIVED? LOGIN</span>
+        <span class="switch-link" onclick="showBox('loginBox')">ALREADY ARCHIVED? SIGN IN</span>
     </div>
 
     <div id="loginBox" class="auth-container hidden">
@@ -33,24 +33,24 @@
         <input type="text" id="loginUser" placeholder="USERNAME">
         <input type="password" id="loginPass" placeholder="PASSWORD">
         
-        <button class="btn effect-btn" id="loginBtn" onclick="handleAuth('login')">LOGIN</button>
+        <button class="btn effect-btn" id="loginBtn" onclick="handleAuth('login')">REQUEST 2FA</button>
         
         <div id="login2FA" class="hidden slide-down">
             <p class="check-email-txt">📩 CHECK YOUR EMAIL</p>
             <input type="text" id="loginCodeInput" placeholder="2FA CODE" class="code-input">
-            <button class="btn effect-btn done-btn" onclick="completeLogin()">DONE</button>
+            <button class="btn effect-btn done-btn" onclick="completeLogin()">AUTHORIZE</button>
         </div>
         
-        <span class="switch-link" onclick="showBox('registerBox')">NEW PLAYER? REGISTER</span>
+        <span class="switch-link" onclick="showBox('registerBox')">NEW PLAYER? CREATE ARCHIVE</span>
     </div>
 
     <div id="dirtScreen" class="hidden fade-in">
-        <h1 id="dirtText">DIRT MC</h1>
+        <h1 id="dirtText">DIRT</h1>
         <div class="server-info">
-            <p class="ip-address">IP: <span>dirtmc.pro:21411</span></p>
-            <a href="https://discord.gg/dirtmc" target="_blank" class="discord-btn">JOIN DISCORD</a>
+            <div class="ip-box">IP: <span>dirtmc.pro:21411</span></div>
+            <a href="https://discord.gg/dirtmc" target="_blank" class="btn effect-btn discord-btn">JOIN DISCORD</a>
         </div>
-        <button class="btn effect-btn logout-btn" onclick="location.reload()">LOGOUT</button>
+        <button class="btn logout-btn" onclick="location.reload()">TERMINATE SESSION</button>
     </div>
 
     <script type="module" src="script.js"></script>
